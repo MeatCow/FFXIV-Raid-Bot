@@ -5,7 +5,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
 public class HelpCommand implements Command {
-    private final String helpMessage = "GW2-Raid-Bot Help:\n" +
+    private final String helpMessage = "FFXIV-Raid-Bot Help:\n" +
             "Commands:\n" +
             "**!setRaidLeaderRole [role]** - Set the role that serves as a raid leader. This is only usable by people with the manage server permission\n" +
             "**!createRaid** - Start the raid creation process. Usable by people with the raid leader role\n" +

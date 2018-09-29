@@ -22,29 +22,28 @@ public class ReactionHandler extends ListenerAdapter {
         }
         if (raid != null) {
             if (Reactions.getSpecs().contains(e.getReactionEmote().getEmote().getName())) {
-                RaidBot bot = RaidBot.getInstance();
-                if(!raid.isUserInRaid(e.getUser().getId())) {
-                    if (bot.getRoleSelectionMap().get(e.getUser().getId()) == null) {
-                        SelectionStep step = new PickRoleStep(raid, e.getReactionEmote().getEmote().getName());
-                        bot.getRoleSelectionMap().put(e.getUser().getId(), step);
-                        e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(step.getStepText()).queue());
-                    } else {
-                        e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are already selecting a role.").queue());
-                    }
+                if(e.getReactionEmote().getEmote().getName().equalsIgnoreCase("X_")) {
+                   raid.removeUser(e.getUser().getId());
                 } else {
-                    //TODO: Remove repetitive logic here
-                    if(raid.getUserNumFlexRoles(e.getUser().getId()) < 2) {
-                        if (bot.getRoleSelectionMap().get(e.getUser().getId()) == null) {
-                            SelectionStep step = new PickFlexRoleStep(raid, e.getReactionEmote().getEmote().getName());
-                            bot.getRoleSelectionMap().put(e.getUser().getId(), step);
-                            e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(step.getStepText()).queue());
+                    if ( !raid.isUserInRaid(e.getUser().getId()) ) {
+                        String spec = e.getReactionEmote().getEmote().getName();
+                        String role = Reactions.getRoleFromSpec(spec);
+                        if(raid.isValidNotFullRole(role)) {
+                            // Determine directly role from choosen specs
+                            raid.addUser(
+                                e.getUser().getId(),
+                                e.getUser().getName(),
+                                spec,
+                                role,
+                                true,
+                                true
+                            );
                         } else {
-                            e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are already selecting a flex role.").queue());
-                        }
-                    } else {
-                        e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You have selected the maximum number of flex roles. Press the X reaction to re-select your roles").queue());
+                            e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Please choose a valid role that is not full.").queue());
                     }
-                    //e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You are already in this raid. Click the X to select a new role").queue());
+                    } else {
+                        e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You have already selected a role. Press the X reaction to remove your choice before.").queue());
+                    }
                 }
             } else if(e.getReactionEmote().getEmote().getName().equalsIgnoreCase("X_")) {
                 raid.removeUser(e.getUser().getId());

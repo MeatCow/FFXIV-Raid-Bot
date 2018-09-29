@@ -9,6 +9,10 @@ import java.net.URL;
 import java.net.URLConnection;
 
 public class GuildCountUtil {
+    public static boolean canSendGuilds()
+    {
+        return new File("discord_bots_token").exists();
+    }
     /**
      * Update the server count on DiscordBots.org, based off an example from their discord.
      * @param jda The JDA library instance

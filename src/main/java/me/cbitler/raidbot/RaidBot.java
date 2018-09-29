@@ -60,7 +60,9 @@ public class RaidBot {
         new Thread(() -> {
             while (true) {
                 try {
-                    GuildCountUtil.sendGuilds(jda);
+                    if (GuildCountUtil.canSendGuilds()) {
+                        GuildCountUtil.sendGuilds(jda);
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

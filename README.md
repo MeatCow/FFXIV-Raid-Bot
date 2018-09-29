@@ -1,5 +1,5 @@
-# GW2 Raid Bot [![Discord Bots](https://discordbots.org/api/widget/status/387404077308575744.png)](https://discordbots.org/bot/387404077308575744)
-This bot is meant to be used to help organize raid teams in discord servers for GuildWars 2.
+# FFXIV Raid Bot [![Discord Bots](https://discordbots.org/api/widget/status/387404077308575744.png)](https://discordbots.org/bot/387404077308575744)
+This bot is meant to be used to help organize raid teams in discord servers for FFXIV.
 It attempts to create a streamlined user experience so that creating and joining raids are easy.
 
 ## How does it work?
@@ -27,12 +27,10 @@ in the same directory as the jar file.
 
 Finally, you can run the bot and invite it to your discord server and start using it for raids!
 
-## Support Discord
-[Discord Server for support for issues with the bot](https://discord.gg/pWs8tDY)
-
 ## Credits
-- Christopher Bitler: Bot development
-- Tyler "Inverness": Bot idea
+- Yann 'Ze' Richard : code adaptation and features for FFXIV
+- Christopher Bitler: Bot development for GW2 version
+- Tyler "Inverness": Bot idea for GW2 version
 
 ## License
 GPLv3

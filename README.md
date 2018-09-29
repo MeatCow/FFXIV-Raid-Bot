@@ -1,4 +1,4 @@
-# FFXIV Raid Bot [![Discord Bots](https://discordbots.org/api/widget/status/387404077308575744.png)](https://discordbots.org/bot/494597392897933381)
+# FFXIV Raid Bot [![Discord Bots](https://discordbots.org/api/widget/status/494597392897933381.png)](https://discordbots.org/bot/494597392897933381)
 This bot is meant to be used to help organize raid teams in discord servers for FFXIV.
 It attempts to create a streamlined user experience so that creating and joining raids are easy.
 

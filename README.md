@@ -27,9 +27,56 @@ in the same directory as the jar file.
 
 Finally, you can run the bot and invite it to your discord server and start using it for raids!
 
+Compilation & install on Debian 9 (include systemd service) :
+```
+# Run this as root user
+adduser --system discordbots
+cd ~discordbots
+mkdir ~discordbots/src
+mkdir -p ~discordbots/bots/FFXIV-Raid-Bot
+sudo apt install maven openjdk-8-jre openjdk-8-jdk
+cd ~discordbots/src
+git clone https://github.com/Zeuh/FFXIV-Raid-Bot.git
+cd FFXIV-Raid-Bot
+mvn package
+cp ~discordbots/src/FFXIV-Raid-Bot/target/FFXIV-Raid-Bot-1.0-SNAPSHOT.jar ~discordbots/bots/FFXIV-Raid-Bot/FFXIV-Raid-Bot.jar
+cp -r ~discordbots/src/FFXIV-Raid-Bot/Reactions ~discordbots/bots/FFXIV-Raid-Bot/
+
+DISCORDBOT_HOME=$(realpath ~discordbots)
+echo "
+[Unit]
+Description=Discord FFXIV Raid Bot
+After=network.target
+
+[Service]
+WorkingDirectory=$DISCORDBOT_HOME/bots/FFXIV-Raid-Bot
+SyslogIdentifier=discordbots
+ExecStart=/bin/sh -c "exec java -jar $DISCORDBOT_HOME/bots/FFXIV-Raid-Bot/FFXIV-Raid-Bot.jar"
+User=discordbots
+Type=simple
+
+[Install]
+WantedBy=multi-user.target" > ~discordbots/bots/FFXIV-Raid-Bot/discord-ffxiv-raid-bot.service
+
+chown -R discordbots.nogroup ~discordbots
+ln -s ~discordbots/bots/FFXIV-Raid-Bot/discord-ffxiv-raid-bot.service /etc/systemd/system/discord-ffxiv-raid-bot.service
+systemctl enable discord-ffxiv-raid-bot.service
+# To start the service run as root : systemctl start discord-ffxiv-raid-bot.service
+```
+Register your bot on : https://discordapp.com/developers/applications/
+
+After this install, you need to put your bot secret token into : ~discordbots/bots/FFXIV-Raid-Bot/token
+
+The invite link with good permission mask (replace YOUR_BOT_ID_HERE by your bot client ID) :
+- https://discordapp.com/oauth2/authorize?client_id=YOUR_BOT_ID_HERE&permissions=490560&scope=bot
+
 ## Credits
-- Yann 'Ze' Richard : code adaptation and features for FFXIV
-- Christopher Bitler: Bot development for GW2 version
+
+### FFXIV adaptation
+- Yann 'Ze' Richard : code adaptation and features for FFXIV, complete example for compile and install on Debian 9.
+
+### GW2 (original version)
+- Christopher Bitler: Bot development for the original GW2 version !
 - Tyler "Inverness": Bot idea for GW2 version
 
 ## License

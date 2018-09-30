@@ -34,7 +34,7 @@ adduser --system discordbots
 cd ~discordbots
 mkdir ~discordbots/src
 mkdir -p ~discordbots/bots/FFXIV-Raid-Bot
-sudo apt install maven openjdk-8-jre openjdk-8-jdk
+apt install maven openjdk-8-jre openjdk-8-jdk
 cd ~discordbots/src
 git clone https://github.com/Zeuh/FFXIV-Raid-Bot.git
 cd FFXIV-Raid-Bot

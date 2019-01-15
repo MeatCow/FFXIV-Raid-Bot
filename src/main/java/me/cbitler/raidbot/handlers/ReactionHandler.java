@@ -32,7 +32,7 @@ public class ReactionHandler extends ListenerAdapter {
                             // Determine directly role from choosen specs
                             raid.addUser(
                                 e.getUser().getId(),
-                                e.getUser().getName(),
+                                e.getMember().getEffectiveName(),
                                 spec,
                                 role,
                                 true,

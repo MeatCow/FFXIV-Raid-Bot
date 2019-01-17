@@ -31,7 +31,7 @@ public class RunChannelStep implements CreationStep {
         }
 
         if(!validChannel) {
-            e.getChannel().sendMessage("Please choose a valid channel.").queue();
+            e.getChannel().sendMessage("Ce chan n'existe pas, essaye encore...").queue();
             return false;
         }
 
@@ -44,7 +44,7 @@ public class RunChannelStep implements CreationStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Enter the channel for raid run announcement:";
+        return "Quel est le nom du chan que je dois pourrir avec l'annonce du raid ?";
     }
 
     /**

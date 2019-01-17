@@ -31,7 +31,7 @@ public class RunTimeStep implements CreationStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Enter the time for raid run:";
+        return "Et c'est à quelle heure ta petite sauterie ?";
     }
 
     /**

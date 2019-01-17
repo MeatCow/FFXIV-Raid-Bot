@@ -3,7 +3,7 @@ package me.cbitler.raidbot.handlers;
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
-import me.cbitler.raidbot.selection.PickFlexRoleStep;
+//import me.cbitler.raidbot.selection.PickFlexRoleStep;
 import me.cbitler.raidbot.selection.PickRoleStep;
 import me.cbitler.raidbot.selection.SelectionStep;
 import me.cbitler.raidbot.utility.Reactions;
@@ -39,10 +39,10 @@ public class ReactionHandler extends ListenerAdapter {
                                 true
                             );
                         } else {
-                            e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Please choose a valid role that is not full.").queue());
+                            e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Allez, on apprend à compter et on choisi un job dans lequel il reste de la place ?").queue());
                     }
                     } else {
-                        e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You have already selected a role. Press the X reaction to remove your choice before.").queue());
+                        e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Alerte Alzheimer ! Tu as déjà choisi un job... Si tu ne veux plus participer avec ce job utilise le \"X\" rouge.").queue());
                     }
                 }
             } else if(e.getReactionEmote().getEmote().getName().equalsIgnoreCase("X_")) {

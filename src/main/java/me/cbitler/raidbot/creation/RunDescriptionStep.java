@@ -31,7 +31,7 @@ public class RunDescriptionStep implements CreationStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Enter description for raid run:";
+        return "Une petite description du raid :";
     }
 
     /**

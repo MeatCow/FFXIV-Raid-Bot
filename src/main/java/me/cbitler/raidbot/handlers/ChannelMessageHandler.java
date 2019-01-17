@@ -7,6 +7,7 @@ import me.cbitler.raidbot.creation.CreationStep;
 import me.cbitler.raidbot.creation.RunNameStep;
 import me.cbitler.raidbot.logs.LogParser;
 import me.cbitler.raidbot.raids.Raid;
+import me.cbitler.raidbot.raids.PendingRaid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.utility.PermissionsUtil;
 import net.dv8tion.jda.core.Permission;
@@ -52,10 +53,16 @@ public class ChannelMessageHandler extends ListenerAdapter {
 
         if (PermissionsUtil.hasRaidLeaderRole(e.getMember())) {
             if (e.getMessage().getRawContent().equalsIgnoreCase("!createRaid")) {
-                CreationStep runNameStep = new RunNameStep(e.getMessage().getGuild().getId());
-                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(runNameStep.getStepText()).queue());
-                bot.getCreationMap().put(e.getAuthor().getId(), runNameStep);
-                e.getMessage().delete().queue();
+                // Verify there is no pending
+                PendingRaid raid = bot.getPendingRaids().get(e.getAuthor().getId());
+                if (raid == null) {
+                    CreationStep runNameStep = new RunNameStep(e.getMessage().getGuild().getId());
+                    e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(runNameStep.getStepText()).queue());
+                    bot.getCreationMap().put(e.getAuthor().getId(), runNameStep);
+                    e.getMessage().delete().queue();
+                } else {
+                    e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Impossible de créer un raid, tu en as un en cours de création...\n\n Si tu t'en souviens plus : Tapes 'cancel' !").queue());
+                }
             } else if (e.getMessage().getRawContent().toLowerCase().startsWith("!removefromraid")) {
                 String[] split = e.getMessage().getRawContent().split(" ");
                 if(split.length < 3) {
@@ -85,7 +92,7 @@ public class ChannelMessageHandler extends ListenerAdapter {
                 String[] commandParts = e.getMessage().getRawContent().split(" ");
                 String raidLeaderRole = combineArguments(commandParts,1);
                 RaidBot.getInstance().setRaidLeaderRole(e.getMember().getGuild().getId(), raidLeaderRole);
-                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Raid leader role updated to: " + raidLeaderRole).queue());
+                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("OK, maintenant si t'es pas **" + raidLeaderRole +"** avant 50 ans t'as raté ta vie !").queue());
                 e.getMessage().delete().queue();
             }
         }

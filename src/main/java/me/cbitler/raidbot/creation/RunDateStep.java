@@ -31,7 +31,7 @@ public class RunDateStep implements CreationStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Enter the date for raid run:";
+        return "Quelle est la date pour ce petit raid ?";
     }
 
     /**

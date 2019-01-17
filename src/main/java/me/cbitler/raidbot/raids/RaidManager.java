@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.awt.Color;
 
 /**
  * Serves as a manager for all of the raids. This includes creating, loading, and deleting raids
@@ -148,6 +149,7 @@ public class RaidManager {
                 }
             }
 
+            /*
             QueryResult userFlexRolesResults = db.query("SELECT * FROM `raidUsersFlexroles`", new String[] {});
 
             while(userFlexRolesResults.getResults().next()) {
@@ -162,7 +164,7 @@ public class RaidManager {
                     raid.addUserFlexRole(id, name, spec, role, false, false);
                 }
             }
-
+            */
             for(Raid raid : raids) {
                 raid.updateMessage();
             }
@@ -203,8 +205,8 @@ public class RaidManager {
                 RaidBot.getInstance().getDatabase().update("DELETE FROM `raidUsers` WHERE `raidId` = ?", new String[]{
                         messageId
                 });
-                RaidBot.getInstance().getDatabase().update("DELETE FROM `raidUsersFlexRoles` WHERE `raidId` = ?",
-                        new String[]{messageId});
+                //RaidBot.getInstance().getDatabase().update("DELETE FROM `raidUsersFlexRoles` WHERE `raidId` = ?",
+                //        new String[]{messageId});
             } catch (Exception e) {
                 System.out.println("Error encountered deleting raid");
             }
@@ -258,19 +260,24 @@ public class RaidManager {
      */
     private static MessageEmbed buildEmbed(PendingRaid raid) {
         EmbedBuilder builder = new EmbedBuilder();
+
         builder.setTitle(raid.getName());
-        builder.addField("Description:" , raid.getDescription(), false);
+        builder.addField("Description :" , raid.getDescription(), false);
         builder.addBlankField(false);
         if (raid.getLeaderName() != null) {
-            builder.addField("Leader: ", "**" + raid.getLeaderName() + "**", false);
+            builder.addField("Créé par : ", "**" + raid.getLeaderName() + "**", false);
         }
         builder.addBlankField(false);
-        builder.addField("Date: ", raid.getDate(), true);
-        builder.addField("Time: ", raid.getTime(), true);
+        builder.addField("Date : ", raid.getDate(), true);
+        builder.addField("Heure : ", raid.getTime(), true);
         builder.addBlankField(false);
-        builder.addField("Roles: ", buildRolesText(raid), true);
-        builder.addField("Flex Roles: ", buildFlexRolesText(raid), true);
+        builder.addField("Roles :", buildRolesText(raid), true);
+        //builder.addField("Flex Roles:", buildFlexRolesText(), true);
         builder.addBlankField(false);
+        //builder.addField("ID : ", messageId, false);
+
+        builder.setColor(new Color(16729856));
+
         return builder.build();
     }
 

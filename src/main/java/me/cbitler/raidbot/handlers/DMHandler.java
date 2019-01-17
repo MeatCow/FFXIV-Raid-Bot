@@ -44,9 +44,8 @@ public class DMHandler extends ListenerAdapter {
                 if(bot.getPendingRaids().get(author.getId()) != null) {
                     bot.getPendingRaids().remove(author.getId());
                 }
-                e.getChannel().sendMessage("Raid creation cancelled.").queue();
+                e.getChannel().sendMessage("OK, on abandonne la création du raid, tristesse ...").queue();
                 return;
-
             }
 
             CreationStep step = bot.getCreationMap().get(author.getId());
@@ -64,16 +63,16 @@ public class DMHandler extends ListenerAdapter {
                     PendingRaid raid = bot.getPendingRaids().remove(author.getId());
                     try {
                         RaidManager.createRaid(raid);
-                        e.getChannel().sendMessage("Raid Created").queue();
+                        e.getChannel().sendMessage("\\o/ Le raid a bien été créé !").queue();
                     } catch (Exception exception) {
-                        e.getChannel().sendMessage("Cannot create raid - does the bot have permission to post in the specified channel?").queue();
+                        e.getChannel().sendMessage("ALERTE ! J'ai pas pu créé le raid, je suis visiblement persécuté et je n'ai pas le droit d'écrire dans le chan ?").queue();
                     }
                 }
             }
         } else if (bot.getRoleSelectionMap().containsKey(author.getId())) {
             if(e.getMessage().getRawContent().equalsIgnoreCase("cancel")) {
                 bot.getRoleSelectionMap().remove(author.getId());
-                e.getChannel().sendMessage("Role selection cancelled.").queue();
+                e.getChannel().sendMessage("Ok, on abandonne la sélection des rôles.").queue();
                 return;
             }
             SelectionStep step = bot.getRoleSelectionMap().get(author.getId());

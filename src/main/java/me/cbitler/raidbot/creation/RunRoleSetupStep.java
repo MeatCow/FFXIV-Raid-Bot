@@ -26,7 +26,7 @@ public class RunRoleSetupStep implements CreationStep {
             if(raid.getRolesWithNumbers().size() > 0) {
                 return true;
             } else {
-                e.getChannel().sendMessage("You must add atleast one role.").queue();
+                e.getChannel().sendMessage("T'es gentil mais il faut au moins un type de participant ...").queue();
                 return false;
             }
         } else {
@@ -34,16 +34,22 @@ public class RunRoleSetupStep implements CreationStep {
                 raid.getRolesWithNumbers().add(new RaidRole(1, "Tank"));
                 raid.getRolesWithNumbers().add(new RaidRole(1, "Heal"));
                 raid.getRolesWithNumbers().add(new RaidRole(2, "DPS"));
-                e.getChannel().sendMessage("Preformated Dungeons roles added !").queue();
+                e.getChannel().sendMessage("BAM ! Une équipe de type Donjon a été ajouté !").queue();
+                e.getChannel().sendMessage("Si tu as terminé, tape *done*").queue();
             } else if ( e.getMessage().getRawContent().trim().equalsIgnoreCase("R") ) {
                 raid.getRolesWithNumbers().add(new RaidRole(2, "Tank"));
                 raid.getRolesWithNumbers().add(new RaidRole(2, "Heal"));
                 raid.getRolesWithNumbers().add(new RaidRole(4, "DPS"));
-                e.getChannel().sendMessage("Preformated Raids roles added !").queue();
+                e.getChannel().sendMessage("BIM ! Une équipe de type Raid a été ajouté !").queue();
+                e.getChannel().sendMessage("Si tu as terminé, tape *done*").queue();
             } else {
                 String[] parts = e.getMessage().getRawContent().split(":");
                 if(parts.length < 2) {
-                    e.getChannel().sendMessage("You need to specify the role in the format [amount]:[Role name] or use preformated roles : 'D' for Dungeons (4 players) or 'R' for Raids (8 Players).").queue();
+                    e.getChannel().sendMessage(
+                        "Tu peux rajouter des types de participants en précisant chaque grands rôles au format : [nombre max]:[Rôle] ou alors utilises directement des rôles préformatés : \n"
+                        + "  - *D* pour Donjons (4 joueurs, 1 Tank, 1 Heal, 2 DPS)\n"
+                        + "  - *R* pour Raids (8 joueurs, 2 Tank, 2 Heal, 4 DPS)\n"
+                    ).queue();
                 } else {
                     try {
                         int amnt = Integer.parseInt(parts[0].trim());
@@ -54,9 +60,10 @@ public class RunRoleSetupStep implements CreationStep {
                         else if ( roleName.equalsIgnoreCase("Tank") ) { roleName = "Tank"; }
 
                         raid.getRolesWithNumbers().add(new RaidRole(amnt, roleName));
-                        e.getChannel().sendMessage("Role added").queue();
+                        e.getChannel().sendMessage("j'ai donc ajouté " + amnt + "  " + roleName + "dans ton raid !").queue();
+                        e.getChannel().sendMessage("Si tu as terminé, tape *done*").queue();
                     } catch (Exception ex) {
-                        e.getChannel().sendMessage("Invalid input: Make sure it's in the format of [number]:[role], like 1:DPS").queue();
+                        e.getChannel().sendMessage("Putain tu tapes n'importe quoi la...").queue();
                     }
                 }
             }
@@ -68,7 +75,12 @@ public class RunRoleSetupStep implements CreationStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Enter the roles for raid run (format: [amount]:[Role name]).\nUse preformated roles : 'D' for Dungeons (4 players) or 'R' for Raids (8 Players). \n\nType done to finish entering roles:";
+        return
+        "Rajoutes des types de participants en précisant chaque grands rôles au format : [nombre max]:[Rôle] ou alors utilises directement des rôles préformatés : \n"
+        + "  - *D* pour Donjons (4 joueurs, 1 Tank, 1 Heal, 2 DPS)\n"
+        + "  - *R* pour Raids (8 joueurs, 2 Tank, 2 Heal, 4 DPS)\n"
+        + "  - pour avoir 8 DPS, tapes *8:dps*\n"
+        + "Quand t'as terminé, signale le moi en tapant *done*";
     }
 
     /**

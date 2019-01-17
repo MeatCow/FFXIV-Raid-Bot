@@ -44,7 +44,9 @@ public class RunNameStep implements CreationStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Raid Setup:\nYou can type cancel at any point during this process to cancel the raid setup\n\nEnter the name for raid run:";
+        return " Allez c’est parti pour la création d'un petit raid des familles !!\n"
+            + "Pendant toute notre petite discussion tu peux taper *cancel* pour annuler, Je ne te cache pas que je suis sensible et que cela me briserai le cœur…\n\n"
+            + "Allez, un petit nom pour cette aventure :";
     }
 
     /**

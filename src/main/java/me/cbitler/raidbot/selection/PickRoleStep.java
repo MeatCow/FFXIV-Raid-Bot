@@ -33,10 +33,10 @@ public class PickRoleStep implements SelectionStep {
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         if(raid.isValidNotFullRole(e.getMessage().getRawContent())) {
             raid.addUser(e.getAuthor().getId(), e.getAuthor().getName(), spec, e.getMessage().getRawContent(), true, true);
-            e.getChannel().sendMessage("Added to raid roster").queue();
+            e.getChannel().sendMessage("Ajouté au raid !").queue();
             return true;
         } else {
-            e.getChannel().sendMessage("Please choose a valid role that is not full.").queue();
+            e.getChannel().sendMessage("Ca serait mieux si tu voulais jouer un role qui soit disponible...").queue();
             return false;
         }
     }
@@ -56,7 +56,7 @@ public class PickRoleStep implements SelectionStep {
      */
     @Override
     public String getStepText() {
-        String text = "Pick a role (";
+        String text = "Choisi un rôle (";
         for (int i = 0; i < raid.getRoles().size(); i++) {
             if (i == raid.getRoles().size()-1) {
                 text += raid.getRoles().get(i).getName();
@@ -64,7 +64,7 @@ public class PickRoleStep implements SelectionStep {
                 text += (raid.getRoles().get(i).getName() + ", ");
             }
         }
-        text += ") or type cancel to cancel role selection.";
+        text += ") ou tape *cancel* pour annuler la sélection de rôles.";
 
         return text;
     }

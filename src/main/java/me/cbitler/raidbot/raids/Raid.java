@@ -4,6 +4,7 @@ import me.cbitler.raidbot.RaidBot;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 
+import java.awt.Color;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -14,7 +15,7 @@ public class Raid {
     String messageId, name, description, date,time, serverId, channelId, raidLeaderName;
     List<RaidRole> roles = new ArrayList<RaidRole>();
     HashMap<RaidUser, String> userToRole = new HashMap<RaidUser, String>();
-    HashMap<RaidUser, List<FlexRole>> usersToFlexRoles = new HashMap<>();
+    //HashMap<RaidUser, List<FlexRole>> usersToFlexRoles = new HashMap<>();
 
     /**
      * Create a new Raid with the specified data
@@ -217,7 +218,7 @@ public class Raid {
         }
 
         userToRole.put(user, role);
-        usersToFlexRoles.computeIfAbsent(user, k -> new ArrayList<>());
+        //usersToFlexRoles.computeIfAbsent(user, k -> new ArrayList<>());
 
         if(update_message) {
             updateMessage();
@@ -237,6 +238,8 @@ public class Raid {
      * @return true if the user was added, false otherwise
      */
     public boolean addUserFlexRole(String id, String name, String spec, String role, boolean db_insert, boolean update_message) {
+        return true;
+        /*
         RaidUser user = getUserByName(name);
         FlexRole frole = new FlexRole(spec, role);
 
@@ -264,7 +267,9 @@ public class Raid {
             updateMessage();
         }
         return true;
+        */
     }
+
 
     /**
      * Check if a specific user is in this raid
@@ -290,15 +295,15 @@ public class Raid {
             Map.Entry<RaidUser, String> user = users.next();
             if(user.getKey().getId().equalsIgnoreCase(id)) {
                 users.remove();
-                usersToFlexRoles.remove(user.getKey());
+                //usersToFlexRoles.remove(user.getKey());
             }
         }
 
         try {
             RaidBot.getInstance().getDatabase().update("DELETE FROM `raidUsers` WHERE `userId` = ? AND `raidId` = ?",
                     new String[] {id, getMessageId()});
-            RaidBot.getInstance().getDatabase().update("DELETE FROM `raidUsersFlexRoles` WHERE `userId` = ? and `raidId` = ?",
-                    new String[] {id, getMessageId()});
+            //RaidBot.getInstance().getDatabase().update("DELETE FROM `raidUsersFlexRoles` WHERE `userId` = ? and `raidId` = ?",
+            //        new String[] {id, getMessageId()});
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -342,19 +347,21 @@ public class Raid {
     private MessageEmbed buildEmbed() {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle(getName());
-        builder.addField("Description:" , getDescription(), false);
+        builder.addField("Description :" , getDescription(), false);
         builder.addBlankField(false);
         if (getRaidLeaderName() != null) {
-            builder.addField("Leader: ", "**" + getRaidLeaderName() + "**", false);
+            builder.addField("Créé par : ", "**" + getRaidLeaderName() + "**", false);
         }
         builder.addBlankField(false);
-        builder.addField("Date: ", getDate(), true);
-        builder.addField("Time: ", getTime(), true);
+        builder.addField("Date : ", getDate(), true);
+        builder.addField("Heure : ", getTime(), true);
         builder.addBlankField(false);
-        builder.addField("Roles:", buildRolesText(), true);
-        builder.addField("Flex Roles:", buildFlexRolesText(), true);
+        builder.addField("Roles :", buildRolesText(), true);
+        //builder.addField("Flex Roles:", buildFlexRolesText(), true);
         builder.addBlankField(false);
-        builder.addField("ID: ", messageId, false);
+        builder.addField("ID : ", messageId, false);
+
+        builder.setColor(new Color(16729856));
 
         return builder.build();
     }
@@ -362,7 +369,7 @@ public class Raid {
     /**
      * Build the flex roles text, which includes a list of flex roles users are playing and their specs
      * @return The flex role text
-     */
+     *
     private String buildFlexRolesText() {
         String text = "";
         for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
@@ -375,7 +382,7 @@ public class Raid {
 
         return text;
     }
-
+    /**/
     /**
      * Build the role text, which shows the roles users are playing in the raids
      * @return The role text
@@ -383,11 +390,14 @@ public class Raid {
     private String buildRolesText() {
         String text = "";
         for(RaidRole role : roles) {
-            text += ("**" + role.name + " (" + role.amount + "):** \n");
+            int cpt = 0;
+            String players = "";
             for(RaidUser user : getUsersInRole(role.name)) {
-                text += "   - " + user.name + " (" + user.spec + ")\n";
+                players += "   - " + user.name + " (" + user.spec + ")\n";
+                cpt++;
             }
-            text += "\n";
+            players += "\n";
+            text += ("**" + role.name + " (" + cpt + "/" + role.amount + "):** \n") + players;
         }
         return text;
     }
@@ -425,7 +435,7 @@ public class Raid {
      * Get the number of flex roles a user has
      * @param id The id of the user
      * @return The number of flex roles that a user has
-     */
+     *
     public int getUserNumFlexRoles(String id) {
         for (Map.Entry<RaidUser, List<FlexRole>> entry : usersToFlexRoles.entrySet()) {
             RaidUser user = entry.getKey();
@@ -436,4 +446,5 @@ public class Raid {
 
         return 0;
     }
+    */
 }

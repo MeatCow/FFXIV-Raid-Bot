@@ -12,7 +12,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.awt.Color;
 
 /**
  * Serves as a manager for all of the raids. This includes creating, loading, and deleting raids
@@ -38,7 +37,7 @@ public class RaidManager {
                 channels.get(0).sendMessage(message).queue(message1 -> {
                     boolean inserted = insertToDatabase(raid, message1.getId(), message1.getGuild().getId(), message1.getChannel().getId());
                     if (inserted) {
-                        Raid newRaid = new Raid(message1.getId(), message1.getGuild().getId(), message1.getChannel().getId(), raid.getLeaderName(), raid.getName(), raid.getDescription(), raid.getDate(), raid.getTime());
+                        Raid newRaid = new Raid(message1.getId(), message1.getGuild().getId(), message1.getChannel().getId(), raid.getLeaderName(), raid.getName(), raid.getDescription(), raid.getDate(), raid.getTime(), raid.getQueued());
                         newRaid.roles.addAll(raid.rolesWithNumbers);
                         raids.add(newRaid);
 
@@ -72,7 +71,7 @@ public class RaidManager {
         String roles = formatRolesForDatabase(raid.getRolesWithNumbers());
 
         try {
-            db.update("INSERT INTO `raids` (`raidId`, `serverId`, `channelId`, `leader`, `name`, `description`, `date`, `time`, `roles`) VALUES (?,?,?,?,?,?,?,?,?)", new String[] {
+            db.update("INSERT INTO `raids` (`raidId`, `serverId`, `channelId`, `leader`, `name`, `description`, `date`, `time`, `queue`, `roles`) VALUES (?,?,?,?,?,?,?,?,?,?)", new String[] {
                     messageId,
                     serverId,
                     channelId,
@@ -81,6 +80,7 @@ public class RaidManager {
                     raid.getDescription(),
                     raid.getDate(),
                     raid.getTime(),
+                    raid.getQueued(),
                     roles
             });
         } catch (SQLException e) {
@@ -95,7 +95,7 @@ public class RaidManager {
      * Load raids
      * This first queries all of the raids and loads the raid data and adds the raids to the raid list
      * Then, it queries the raid users and inserts them into their relevant raids, updating the embedded messages
-     * Finally, it queries the raid users' flex roles and inserts those to the raids
+     * Finally, it queries the raid users roles and inserts those to the raids
      */
     public static void loadRaids() {
         RaidBot bot = RaidBot.getInstance();
@@ -115,13 +115,16 @@ public class RaidManager {
                 String messageId = results.getResults().getString("raidId");
                 String serverId = results.getResults().getString("serverId");
                 String channelId = results.getResults().getString("channelId");
-
+                String queued = results.getResults().getString("queue");
+                if ( queued == null ) {
+                    queued = "0";
+                }
                 String leaderName = null;
                 try {
                     leaderName = results.getResults().getString("leader");
                 } catch (Exception e) { }
 
-                Raid raid = new Raid(messageId, serverId, channelId, leaderName, name, description, date, time);
+                Raid raid = new Raid(messageId, serverId, channelId, leaderName, name, description, date, time, queued);
                 String[] roleSplit = rolesText.split(";");
                 for(String roleAndAmount : roleSplit) {
                     String[] parts = roleAndAmount.split(":");
@@ -130,44 +133,36 @@ public class RaidManager {
                     raid.roles.add(new RaidRole(amnt, role));
                 }
                 raids.add(raid);
+                System.out.println("Adding raid : " + messageId +" "+ serverId +" "+ channelId +" "+ leaderName +" "+ name +" "+ description +" "+ date +" "+ time +" "+ queued);
             }
             results.getResults().close();
             results.getStmt().close();
 
-            QueryResult userResults = db.query("SELECT * FROM `raidUsers`", new String[] {});
+            QueryResult userResults = db.query("SELECT * FROM `raidUsers` ORDER BY ordre ASC", new String[] {});
 
             while(userResults.getResults().next()) {
-                String id = userResults.getResults().getString("userId");
-                String name = userResults.getResults().getString("username");
-                String spec = userResults.getResults().getString("spec");
-                String role = userResults.getResults().getString("role");
+                String id     = userResults.getResults().getString("userId");
+                String name   = userResults.getResults().getString("username");
+                String spec   = userResults.getResults().getString("spec");
+                String role   = userResults.getResults().getString("role");
+                String ordre  = userResults.getResults().getString("ordre");
+                if ( ordre == null ) {
+                    ordre = "1";
+                }
                 String raidId = userResults.getResults().getString("raidId");
 
                 Raid raid = RaidManager.getRaid(raidId);
                 if(raid != null) {
-                    raid.addUser(id, name, spec, role, false, false);
+                    raid.addUser(id, name, spec, role, ordre, false, false);
                 }
             }
 
-            /*
-            QueryResult userFlexRolesResults = db.query("SELECT * FROM `raidUsersFlexroles`", new String[] {});
-
-            while(userFlexRolesResults.getResults().next()) {
-                String id = userFlexRolesResults.getResults().getString("userId");
-                String name = userFlexRolesResults.getResults().getString("username");
-                String spec = userFlexRolesResults.getResults().getString("spec");
-                String role = userFlexRolesResults.getResults().getString("role");
-                String raidId = userFlexRolesResults.getResults().getString("raidId");
-
-                Raid raid = RaidManager.getRaid(raidId);
-                if(raid != null) {
-                    raid.addUserFlexRole(id, name, spec, role, false, false);
-                }
-            }
-            */
+            int cpt = 0;
             for(Raid raid : raids) {
                 raid.updateMessage();
+                cpt++;
             }
+            System.out.println("All raids loaded : " + cpt);
         } catch (SQLException e) {
             System.out.println("Couldn't load raids.. exiting");
             e.printStackTrace();
@@ -205,8 +200,6 @@ public class RaidManager {
                 RaidBot.getInstance().getDatabase().update("DELETE FROM `raidUsers` WHERE `raidId` = ?", new String[]{
                         messageId
                 });
-                //RaidBot.getInstance().getDatabase().update("DELETE FROM `raidUsersFlexRoles` WHERE `raidId` = ?",
-                //        new String[]{messageId});
             } catch (Exception e) {
                 System.out.println("Error encountered deleting raid");
             }
@@ -259,47 +252,6 @@ public class RaidManager {
      * @return The embedded message
      */
     private static MessageEmbed buildEmbed(PendingRaid raid) {
-        EmbedBuilder builder = new EmbedBuilder();
-
-        builder.setTitle(raid.getName());
-        builder.addField("Description :" , raid.getDescription(), false);
-        builder.addBlankField(false);
-        if (raid.getLeaderName() != null) {
-            builder.addField("Créé par : ", "**" + raid.getLeaderName() + "**", false);
-        }
-        builder.addBlankField(false);
-        builder.addField("Date : ", raid.getDate(), true);
-        builder.addField("Heure : ", raid.getTime(), true);
-        builder.addBlankField(false);
-        builder.addField("Roles :", buildRolesText(raid), true);
-        //builder.addField("Flex Roles:", buildFlexRolesText(), true);
-        builder.addBlankField(false);
-        //builder.addField("ID : ", messageId, false);
-
-        builder.setColor(new Color(16729856));
-
-        return builder.build();
-    }
-
-    /**
-     * Builds the text to go into the roles field in the embedded message
-     * @param raid The raid object
-     * @return The role text
-     */
-    private static String buildRolesText(PendingRaid raid) {
-        String text = "";
-        for(RaidRole role : raid.getRolesWithNumbers()) {
-            text += ("**" + role.name + " (" + role.amount + "):** \n");
-        }
-        return text;
-    }
-
-    /**
-     * Build the flex role text. This is blank here as we have no flex roles at this point.
-     * @param raid
-     * @return The flex roles text (blank here)
-     */
-    private static String buildFlexRolesText(PendingRaid raid) {
-        return "";
+        return RaidMessageBuilder.buildEmbed(raid);
     }
 }

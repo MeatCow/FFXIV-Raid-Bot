@@ -10,12 +10,14 @@ public class RaidUser {
     String name;
     String spec;
     String role;
+    String ordre;
 
-    public RaidUser(String id, String name, String spec, String role) {
+    public RaidUser(String id, String name, String spec, String role, String ordre) {
         this.id = id;
         this.name = name;
         this.spec = spec;
         this.role = role;
+        this.ordre = ordre;
     }
 
     public String getId() {

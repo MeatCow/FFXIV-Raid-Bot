@@ -9,7 +9,7 @@ import java.util.List;
  * @author Christopher Bitler
  */
 public class PendingRaid {
-    String name, description, date, time, announcementChannel, serverId, leaderName;
+    String name, description, date, time, announcementChannel, serverId, leaderName, queued;
     List<RaidRole> rolesWithNumbers = new ArrayList<RaidRole>();
 
     public String getName() {
@@ -70,5 +70,13 @@ public class PendingRaid {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void setQueued(String queued) {
+        this.queued = queued;
+    }
+
+    public String getQueued() {
+        return queued;
     }
 }

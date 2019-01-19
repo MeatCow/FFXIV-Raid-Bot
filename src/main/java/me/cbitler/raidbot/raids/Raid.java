@@ -9,13 +9,12 @@ import java.sql.SQLException;
 import java.util.*;
 
 /**
- * Represents a raid and has methods for adding/removing users, user flex roles, etc
+ * Represents a raid and has methods for adding/removing users, roles, etc
  */
 public class Raid {
-    String messageId, name, description, date,time, serverId, channelId, raidLeaderName;
+    String messageId, name, description, date,time, serverId, channelId, raidLeaderName, queued;
     List<RaidRole> roles = new ArrayList<RaidRole>();
-    HashMap<RaidUser, String> userToRole = new HashMap<RaidUser, String>();
-    //HashMap<RaidUser, List<FlexRole>> usersToFlexRoles = new HashMap<>();
+    LinkedHashMap<RaidUser, String> userToRole = new LinkedHashMap<RaidUser, String>();
 
     /**
      * Create a new Raid with the specified data
@@ -26,8 +25,9 @@ public class Raid {
      * @param name The name of the raid
      * @param date The date of the raid
      * @param time The time of the raid
+     * @param queued is the raid have a queue ? 0/1
      */
-    public Raid(String messageId, String serverId, String channelId, String raidLeaderName, String name, String description, String date, String time) {
+    public Raid(String messageId, String serverId, String channelId, String raidLeaderName, String name, String description, String date, String time, String queued) {
         this.messageId = messageId;
         this.serverId = serverId;
         this.channelId = channelId;
@@ -36,6 +36,15 @@ public class Raid {
         this.description = description;
         this.date = date;
         this.time = time;
+        this.queued = queued;
+    }
+
+    /**
+     * Get the message ID for this raid
+     * @return The message ID for this raid
+     */
+    public String getQueued() {
+        return queued;
     }
 
     /**
@@ -123,6 +132,10 @@ public class Raid {
      */
     public boolean isValidNotFullRole(String role) {
         RaidRole r = getRole(role);
+        // if queued raid, there is no limit
+        if(queued.equals("1")) {
+            return true;
+        }
 
         if(r != null) {
             int max = r.getAmount();
@@ -168,7 +181,6 @@ public class Raid {
         for(Map.Entry<RaidUser, String> entry : userToRole.entrySet()) {
             if(entry.getValue().equalsIgnoreCase(role)) inRole+=1;
         }
-
         return inRole;
     }
 
@@ -196,29 +208,31 @@ public class Raid {
      * @param name The name of the user
      * @param spec The specialization they are playing
      * @param role The role they will be playing in the raid
+     * @param ordre unix timestamp of user have been added
      * @param db_insert Whether or not the user should be inserted. This is false when the roles are loaded from the database.
      * @return true if the user was added, false otherwise
      */
-    public boolean addUser(String id, String name, String spec, String role, boolean db_insert, boolean update_message) {
-        RaidUser user = new RaidUser(id, name, spec, role);
+    public boolean addUser(String id, String name, String spec, String role, String ordre, boolean db_insert, boolean update_message) {
+        RaidUser user = new RaidUser(id, name, spec, role, ordre);
 
         if(db_insert) {
             try {
-                RaidBot.getInstance().getDatabase().update("INSERT INTO `raidUsers` (`userId`, `username`, `spec`, `role`, `raidId`)" +
-                        " VALUES (?,?,?,?,?)", new String[]{
+                RaidBot.getInstance().getDatabase().update("INSERT INTO `raidUsers` (`userId`, `username`, `spec`, `role`, `ordre`, `raidId`)" +
+                        " VALUES (?,?,?,?,?,?)", new String[]{
                         id,
                         name,
                         spec,
                         role,
-                        this.messageId
+                        ordre,
+                        getMessageId()
                 });
             } catch (SQLException e) {
+                e.printStackTrace();
                 return false;
             }
         }
 
         userToRole.put(user, role);
-        //usersToFlexRoles.computeIfAbsent(user, k -> new ArrayList<>());
 
         if(update_message) {
             updateMessage();
@@ -236,40 +250,11 @@ public class Raid {
      * @param role The flex role they will be playing in the raid
      * @param db_insert Whether or not the user should be inserted. This is false when the roles are loaded from the database.
      * @return true if the user was added, false otherwise
-     */
+     *
     public boolean addUserFlexRole(String id, String name, String spec, String role, boolean db_insert, boolean update_message) {
         return true;
-        /*
-        RaidUser user = getUserByName(name);
-        FlexRole frole = new FlexRole(spec, role);
-
-        if(db_insert) {
-            try {
-                RaidBot.getInstance().getDatabase().update("INSERT INTO `raidUsersFlexRoles` (`userId`, `username`, `spec`, `role`, `raidId`)" +
-                        " VALUES (?,?,?,?,?)", new String[] {
-                        id,
-                        name,
-                        spec,
-                        role,
-                        this.messageId
-                });
-            } catch (Exception e) {
-                return false;
-            }
-        }
-
-        if(usersToFlexRoles.get(user) == null) {
-            usersToFlexRoles.put(user, new ArrayList<>());
-        }
-
-        usersToFlexRoles.get(user).add(frole);
-        if(update_message) {
-            updateMessage();
-        }
-        return true;
-        */
     }
-
+    */
 
     /**
      * Check if a specific user is in this raid
@@ -286,7 +271,7 @@ public class Raid {
     }
 
     /**
-     * Remove a user from this raid. This also updates the database to remove them from the raid and any flex roles they are in
+     * Remove a user from this raid. This also updates the database to remove them from the raid
      * @param id The user's id
      */
     public void removeUser(String id) {
@@ -295,15 +280,12 @@ public class Raid {
             Map.Entry<RaidUser, String> user = users.next();
             if(user.getKey().getId().equalsIgnoreCase(id)) {
                 users.remove();
-                //usersToFlexRoles.remove(user.getKey());
             }
         }
 
         try {
             RaidBot.getInstance().getDatabase().update("DELETE FROM `raidUsers` WHERE `userId` = ? AND `raidId` = ?",
                     new String[] {id, getMessageId()});
-            //RaidBot.getInstance().getDatabase().update("DELETE FROM `raidUsersFlexRoles` WHERE `userId` = ? and `raidId` = ?",
-            //        new String[] {id, getMessageId()});
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -345,61 +327,7 @@ public class Raid {
      * @return The embedded message representing this raid
      */
     private MessageEmbed buildEmbed() {
-        EmbedBuilder builder = new EmbedBuilder();
-        builder.setTitle(getName());
-        builder.addField("Description :" , getDescription(), false);
-        builder.addBlankField(false);
-        if (getRaidLeaderName() != null) {
-            builder.addField("Créé par : ", "**" + getRaidLeaderName() + "**", false);
-        }
-        builder.addBlankField(false);
-        builder.addField("Date : ", getDate(), true);
-        builder.addField("Heure : ", getTime(), true);
-        builder.addBlankField(false);
-        builder.addField("Roles :", buildRolesText(), true);
-        //builder.addField("Flex Roles:", buildFlexRolesText(), true);
-        builder.addBlankField(false);
-        builder.addField("ID : ", messageId, false);
-
-        builder.setColor(new Color(16729856));
-
-        return builder.build();
-    }
-
-    /**
-     * Build the flex roles text, which includes a list of flex roles users are playing and their specs
-     * @return The flex role text
-     *
-    private String buildFlexRolesText() {
-        String text = "";
-        for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
-            if(flex.getKey() != null) {
-                for (FlexRole frole : flex.getValue()) {
-                    text += ("- " + flex.getKey().getName() + " (" + frole.spec + "/" + frole.role + ")\n");
-                }
-            }
-        }
-
-        return text;
-    }
-    /**/
-    /**
-     * Build the role text, which shows the roles users are playing in the raids
-     * @return The role text
-     */
-    private String buildRolesText() {
-        String text = "";
-        for(RaidRole role : roles) {
-            int cpt = 0;
-            String players = "";
-            for(RaidUser user : getUsersInRole(role.name)) {
-                players += "   - " + user.name + " (" + user.spec + ")\n";
-                cpt++;
-            }
-            players += "\n";
-            text += ("**" + role.name + " (" + cpt + "/" + role.amount + "):** \n") + players;
-        }
-        return text;
+        return RaidMessageBuilder.buildEmbed(this);
     }
 
     /**
@@ -431,20 +359,4 @@ public class Raid {
         removeUser(idToRemove);
     }
 
-    /**
-     * Get the number of flex roles a user has
-     * @param id The id of the user
-     * @return The number of flex roles that a user has
-     *
-    public int getUserNumFlexRoles(String id) {
-        for (Map.Entry<RaidUser, List<FlexRole>> entry : usersToFlexRoles.entrySet()) {
-            RaidUser user = entry.getKey();
-            if (user.id.equalsIgnoreCase(id)) {
-                return entry.getValue().size();
-            }
-        }
-
-        return 0;
-    }
-    */
 }

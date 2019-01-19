@@ -87,6 +87,6 @@ public class RunRoleSetupStep implements CreationStep {
      * {@inheritDoc}
      */
     public CreationStep getNextStep() {
-        return null;
+        return new RunQueuedRaidStep();
     }
 }

@@ -22,6 +22,7 @@ public class Database {
             + " `description` text, \n"
             + " `date` text NOT NULL, \n"
             + " `time` text NOT NULL, \n"
+            + " queue  text NOT NULL, \n"
             + " roles text NOT NULL);";
 
     String raidUsersTableInit = "CREATE TABLE IF NOT EXISTS raidUsers (\n"
@@ -29,24 +30,8 @@ public class Database {
             + " username text, \n"
             + " spec text, \n"
             + " role text, \n"
-            + " raidId text)";
-
-    String raidUsersQueueTableInit = "CREATE TABLE IF NOT EXISTS raidUsersQueue(\n"
-            + " userId text, \n"
-            + " username text, \n"
-            + " spec text, \n"
-            + " role text, \n"
             + " ordre text, \n"
             + " raidId text)";
-
-    /*
-    String raidUsersFlexRolesTableInit = "CREATE TABLE IF NOT EXISTS raidUsersFlexRoles (\n"
-            + " userId text, \n"
-            + " username text, \n"
-            + " spec text, \n"
-            + " role text, \n"
-            + " raidId text)";
-    */
 
     String botServerSettingsInit = "CREATE TABLE IF NOT EXISTS serverSettings (\n"
             + " serverId text PRIMARY KEY, \n"
@@ -126,14 +111,14 @@ public class Database {
     public void tableInits() throws SQLException {
         connection.createStatement().execute(raidTableInit);
         connection.createStatement().execute(raidUsersTableInit);
-        connection.createStatement().execute(raidUsersQueueTableInit);
         connection.createStatement().execute(botServerSettingsInit);
 
-        /*
+        // Database updates
         try {
-            connection.createStatement().execute("ALTER TABLE raids ADD COLUMN leader text");
-            connection.createStatement().execute("ALTER TABLE raids ADD COLUMN `description` text");
+            connection.createStatement().execute("DROP TABLE raidUsersQueue");
+            connection.createStatement().execute("ALTER TABLE raidUsers ADD COLUMN ordre text");
+            connection.createStatement().execute("ALTER TABLE raids ADD COLUMN queue text");
+            //connection.createStatement().execute("ALTER TABLE raids DROP COLUMN ordre text");
         } catch (Exception e) { }
-        */
     }
 }

@@ -4,6 +4,10 @@ import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidUser;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Step for picking a role for a raid
  * @author Christopher Bitler
@@ -32,7 +36,9 @@ public class PickRoleStep implements SelectionStep {
     @Override
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         if(raid.isValidNotFullRole(e.getMessage().getRawContent())) {
-            raid.addUser(e.getAuthor().getId(), e.getAuthor().getName(), spec, e.getMessage().getRawContent(), true, true);
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            String ordre = String.valueOf(timestamp.getTime());
+            raid.addUser(e.getAuthor().getId(), e.getAuthor().getName(), spec, e.getMessage().getRawContent(), ordre, true, true);
             e.getChannel().sendMessage("Ajouté au raid !").queue();
             return true;
         } else {

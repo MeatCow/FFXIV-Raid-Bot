@@ -16,6 +16,7 @@ public class Reactions {
             "Paladin",
             "Warrior",
             "DarkKnight",
+            "Gunbreaker",
             "WhiteMage",
             "Scholar",
             "Astrologian",
@@ -28,6 +29,7 @@ public class Reactions {
             "Machinist",
             "RedMage",
             "Samurai",
+            "Dancer",
             "X_"
     };
 
@@ -53,6 +55,7 @@ public class Reactions {
             case "Paladin":
             case "Warrior":
             case "DarkKnight":
+            case "Gunbreaker":
                 return "Tank";
             case "WhiteMage":
             case "Scholar":

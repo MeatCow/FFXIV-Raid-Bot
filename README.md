@@ -37,7 +37,7 @@ mkdir ~discordbots/src
 mkdir -p ~discordbots/bots/FFXIV-Raid-Bot
 apt install maven openjdk-8-jre openjdk-8-jdk
 cd ~discordbots/src
-git clone https://github.com/Zeuh/FFXIV-Raid-Bot.git
+git clone https://github.com/MeatCow/FFXIV-Raid-Bot.git
 cd FFXIV-Raid-Bot
 mvn package
 cp ~discordbots/src/FFXIV-Raid-Bot/target/FFXIV-Raid-Bot-1.0-SNAPSHOT.jar ~discordbots/bots/FFXIV-Raid-Bot/FFXIV-Raid-Bot.jar

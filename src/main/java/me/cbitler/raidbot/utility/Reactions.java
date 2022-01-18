@@ -12,7 +12,7 @@ public class Reactions {
     /**
      * List of reactions representing classes
      */
-    static String[] specs = {
+    private static String[] specs = {
             "Paladin",
             "Warrior",
             "DarkKnight",
@@ -20,6 +20,7 @@ public class Reactions {
             "WhiteMage",
             "Scholar",
             "Astrologian",
+            "Sage",
             "Bard",
             "Dragoon",
             "Monk",
@@ -29,6 +30,7 @@ public class Reactions {
             "Machinist",
             "RedMage",
             "Samurai",
+            "Reaper",
             "Dancer",
             "X_"
     };
@@ -60,6 +62,7 @@ public class Reactions {
             case "WhiteMage":
             case "Scholar":
             case "Astrologian":
+            case "Sage":
                 return "Heal";
             default:
                 return "DPS";

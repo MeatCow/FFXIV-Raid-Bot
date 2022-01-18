@@ -9,6 +9,8 @@ import net.dv8tion.jda.core.exceptions.RateLimitedException;
 
 import javax.security.auth.login.LoginException;
 import java.io.*;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Start the program, read the token, and start the bot

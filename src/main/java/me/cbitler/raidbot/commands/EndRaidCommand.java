@@ -3,6 +3,7 @@ package me.cbitler.raidbot.commands;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.utility.PermissionsUtil;
+import me.cbitler.raidbot.utility.I18n;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
@@ -33,7 +34,7 @@ public class EndRaidCommand implements Command {
                     boolean deleted = RaidManager.deleteRaid(raidId);
 
                     if (deleted) {
-                        author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Raid effacé !").queue());
+                        author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(I18n.getMessage("raid_cancelled")).queue());
                     } else {
                         author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("C'est la merde, j'arrive pas à effacer le raid...").queue());
                     }

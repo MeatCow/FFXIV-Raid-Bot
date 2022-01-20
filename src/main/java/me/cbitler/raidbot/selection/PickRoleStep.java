@@ -2,6 +2,7 @@ package me.cbitler.raidbot.selection;
 
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidUser;
+import me.cbitler.raidbot.utility.I18n;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 import java.sql.Timestamp;
@@ -39,10 +40,10 @@ public class PickRoleStep implements SelectionStep {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             String ordre = String.valueOf(timestamp.getTime());
             raid.addUser(e.getAuthor().getId(), e.getAuthor().getName(), spec, e.getMessage().getRawContent(), ordre, true, true);
-            e.getChannel().sendMessage("Ajouté au raid !").queue();
+            e.getChannel().sendMessage(I18n.getMessage("added_to_raid")).queue();
             return true;
         } else {
-            e.getChannel().sendMessage("Ca serait mieux si tu voulais jouer un role qui soit disponible...").queue();
+            e.getChannel().sendMessage(I18n.getMessage("role_full_error")).queue();
             return false;
         }
     }
@@ -62,7 +63,7 @@ public class PickRoleStep implements SelectionStep {
      */
     @Override
     public String getStepText() {
-        String text = "Choisi un rôle (";
+        String text = I18n.getMessage("select_a_role") + " (";
         for (int i = 0; i < raid.getRoles().size(); i++) {
             if (i == raid.getRoles().size()-1) {
                 text += raid.getRoles().get(i).getName();
@@ -70,7 +71,7 @@ public class PickRoleStep implements SelectionStep {
                 text += (raid.getRoles().get(i).getName() + ", ");
             }
         }
-        text += ") ou tape *cancel* pour annuler la sélection de rôles.";
+        text += ") " + I18n.getMessage("or_hit_cancel");
 
         return text;
     }

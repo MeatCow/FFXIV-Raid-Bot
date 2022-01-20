@@ -2,6 +2,7 @@ package me.cbitler.raidbot.creation;
 
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.PendingRaid;
+import me.cbitler.raidbot.utility.I18n;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
@@ -44,9 +45,7 @@ public class RunNameStep implements CreationStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return " Allez c’est parti pour la création d'un petit raid des familles !!\n"
-            + "Pendant toute notre petite discussion tu peux taper *cancel* pour annuler, Je ne te cache pas que je suis sensible et que cela me briserai le cœur…\n\n"
-            + "Allez, un petit nom pour cette aventure :";
+        return I18n.getMessage("raid_name_setup");
     }
 
     /**

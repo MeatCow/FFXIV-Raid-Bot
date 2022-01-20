@@ -3,6 +3,7 @@ package me.cbitler.raidbot.creation;
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.PendingRaid;
 import me.cbitler.raidbot.raids.RaidRole;
+import me.cbitler.raidbot.utility.I18n;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
@@ -22,11 +23,11 @@ public class RunRoleSetupStep implements CreationStep {
         RaidBot bot = RaidBot.getInstance();
         PendingRaid raid = bot.getPendingRaids().get(e.getAuthor().getId());
 
-        if(e.getMessage().getRawContent().trim().equalsIgnoreCase("done")) {
+        if(e.getMessage().getRawContent().trim().equalsIgnoreCase("done")) { //TODO: Get content of message only once
             if(raid.getRolesWithNumbers().size() > 0) {
                 return true;
             } else {
-                e.getChannel().sendMessage("T'es gentil mais il faut au moins un type de participant ...").queue();
+                e.getChannel().sendMessage(I18n.getMessage("add_minimum_roles")).queue();
                 return false;
             }
         } else {
@@ -34,36 +35,32 @@ public class RunRoleSetupStep implements CreationStep {
                 raid.getRolesWithNumbers().add(new RaidRole(1, "Tank"));
                 raid.getRolesWithNumbers().add(new RaidRole(1, "Heal"));
                 raid.getRolesWithNumbers().add(new RaidRole(2, "DPS"));
-                e.getChannel().sendMessage("BAM ! Une équipe de type Donjon a été ajouté !").queue();
-                e.getChannel().sendMessage("Si tu as terminé, tape *done*").queue();
+                e.getChannel().sendMessage(I18n.getMessage("preformed_dungeon_added")).queue();
+                e.getChannel().sendMessage(I18n.getMessage("done_query")).queue(); //TODO: Put text into final variable
             } else if ( e.getMessage().getRawContent().trim().equalsIgnoreCase("R") ) {
                 raid.getRolesWithNumbers().add(new RaidRole(2, "Tank"));
                 raid.getRolesWithNumbers().add(new RaidRole(2, "Heal"));
                 raid.getRolesWithNumbers().add(new RaidRole(4, "DPS"));
-                e.getChannel().sendMessage("BIM ! Une équipe de type Raid a été ajouté !").queue();
-                e.getChannel().sendMessage("Si tu as terminé, tape *done*").queue();
+                e.getChannel().sendMessage(I18n.getMessage("preformed_raid_added")).queue();
+                e.getChannel().sendMessage(I18n.getMessage("done_query")).queue();
             } else {
                 String[] parts = e.getMessage().getRawContent().split(":");
                 if(parts.length < 2) {
-                    e.getChannel().sendMessage(
-                        "Tu peux rajouter des types de participants en précisant chaque grands rôles au format : [nombre max]:[Rôle] ou alors utilises directement des rôles préformatés : \n"
-                        + "  - *D* pour Donjons (4 joueurs, 1 Tank, 1 Heal, 2 DPS)\n"
-                        + "  - *R* pour Raids (8 joueurs, 2 Tank, 2 Heal, 4 DPS)\n"
-                    ).queue();
+                    e.getChannel().sendMessage(I18n.getMessage("preformed_setup_info")).queue();
                 } else {
                     try {
                         int amnt = Integer.parseInt(parts[0].trim());
                         String roleName = parts[1].trim();
-                        // Standardize for role : DPS Heal Tank
+                        // TODO: Standardize for role : DPS Heal Tank
                         if ( roleName.equalsIgnoreCase("DPS") ) { roleName = "DPS"; }
                         else if ( roleName.equalsIgnoreCase("Heal") ) { roleName = "Heal"; }
                         else if ( roleName.equalsIgnoreCase("Tank") ) { roleName = "Tank"; }
 
                         raid.getRolesWithNumbers().add(new RaidRole(amnt, roleName));
-                        e.getChannel().sendMessage("j'ai donc ajouté " + amnt + "  " + roleName + "dans ton raid !").queue();
-                        e.getChannel().sendMessage("Si tu as terminé, tape *done*").queue();
+                        e.getChannel().sendMessage(I18n.getMessage("i_have_added") + amnt + "  " + roleName + I18n.getMessage("to_your_raid")).queue(); //TODO: Change format / Integrate StringBuilder
+                        e.getChannel().sendMessage(I18n.getMessage("done_query")).queue();
                     } catch (Exception ex) {
-                        e.getChannel().sendMessage("Putain tu tapes n'importe quoi la...").queue();
+                        e.getChannel().sendMessage(I18n.getMessage("role_input_error")).queue();
                     }
                 }
             }
@@ -75,12 +72,7 @@ public class RunRoleSetupStep implements CreationStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return
-        "Rajoutes des types de participants en précisant chaque grands rôles au format : [nombre max]:[Rôle] ou alors utilises directement des rôles préformatés : \n"
-        + "  - *D* pour Donjons (4 joueurs, 1 Tank, 1 Heal, 2 DPS)\n"
-        + "  - *R* pour Raids (8 joueurs, 2 Tank, 2 Heal, 4 DPS)\n"
-        + "  - pour avoir 8 DPS, tapes *8:dps*\n"
-        + "Quand t'as terminé, signale le moi en tapant *done*";
+        return I18n.getMessage("preformed_setup_info");
     }
 
     /**

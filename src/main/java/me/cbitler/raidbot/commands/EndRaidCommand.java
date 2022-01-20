@@ -36,10 +36,10 @@ public class EndRaidCommand implements Command {
                     if (deleted) {
                         author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(I18n.getMessage("raid_cancelled")).queue());
                     } else {
-                        author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("C'est la merde, j'arrive pas à effacer le raid...").queue());
+                        author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(I18n.getMessage("raid_erase_error")).queue());
                     }
                 } else {
-                    author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Dis non à la drogue ! Ce raid n'existe pas !").queue());
+                    author.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(I18n.getMessage("raid_nonexistent")).queue());
                 }
             }
         }

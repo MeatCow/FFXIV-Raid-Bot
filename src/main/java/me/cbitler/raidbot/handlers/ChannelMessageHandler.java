@@ -9,6 +9,7 @@ import me.cbitler.raidbot.logs.LogParser;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.PendingRaid;
 import me.cbitler.raidbot.raids.RaidManager;
+import me.cbitler.raidbot.utility.I18n;
 import me.cbitler.raidbot.utility.PermissionsUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.ChannelType;
@@ -92,7 +93,7 @@ public class ChannelMessageHandler extends ListenerAdapter {
                 String[] commandParts = e.getMessage().getRawContent().split(" ");
                 String raidLeaderRole = combineArguments(commandParts,1);
                 RaidBot.getInstance().setRaidLeaderRole(e.getMember().getGuild().getId(), raidLeaderRole);
-                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("OK, maintenant si t'es pas **" + raidLeaderRole +"** avant 50 ans t'as raté ta vie !").queue());
+                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(I18n.getMessage("leader_role_updated") + raidLeaderRole).queue());
                 e.getMessage().delete().queue();
             }
         }

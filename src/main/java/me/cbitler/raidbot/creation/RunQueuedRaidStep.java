@@ -2,6 +2,7 @@ package me.cbitler.raidbot.creation;
 
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.PendingRaid;
+import me.cbitler.raidbot.utility.I18n;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
@@ -38,11 +39,11 @@ public class RunQueuedRaidStep implements CreationStep {
                 yn = "0";
                 break;
             default:
-                e.getChannel().sendMessage("Répondre **oui** ou **non** c'est trop compliqué ?!").queue();
+                e.getChannel().sendMessage(I18n.getMessage("yes_no_request")).queue();
                 return false;
         }
 
-        raid.setQueued(yn);
+        raid.setQueued(yn); //TODO: Change to boolean
 
         return true;
     }
@@ -51,7 +52,7 @@ public class RunQueuedRaidStep implements CreationStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Veux-tu une liste d'attente pour ce raid ? [Oui/Non]";
+        return I18n.getMessage("waiting_list_query");
     }
 
     /**

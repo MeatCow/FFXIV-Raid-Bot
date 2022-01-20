@@ -1,6 +1,7 @@
 package me.cbitler.raidbot.raids;
 
 import me.cbitler.raidbot.RaidBot;
+import me.cbitler.raidbot.utility.I18n;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.*;
 
@@ -53,7 +54,7 @@ public class RaidMessageBuilder {
         String thumbnail_img_url = "https://tabula-rasa.ovh/discord/The_Feast3_Icon.png";
         String footer_img_url    = "https://ffxiv.gamerescape.com/w/images/f/f2/Mob19_Icon.png";
         String author_url        = "https://tabula-rasa.ovh/";
-        String greets            = fieldValuePrefix + fieldValuePrefix + " By Yrline Hil'Wayard @Cerberus ! Envoyez vos dons ;)";
+        String greets            = fieldValuePrefix + fieldValuePrefix + " By Yrline Hil'Wayard @Cerberus !";
 
         String greetsLine        = "";
         Boolean legende          = false;
@@ -69,15 +70,15 @@ public class RaidMessageBuilder {
         if ( queued.equals("1") ) {
             legende = true;
             greetsLine = greets;
-            legendeLine = "**" + userInRaidPrefix + "** : tout est ok !\n";
-            legendeLine += "**" + userInQueuePrefix + "** : en liste d'attente..\n";
+            legendeLine = "**" + userInRaidPrefix + "** " + I18n.getMessage("in_raid");
+            legendeLine += "**" + userInQueuePrefix + "** " + I18n.getMessage("on_waiting_list");
         }
 
-        builder.addField(":gem: Créé par : ", "**" + fieldValuePrefix + leader + "**", true);
-        builder.addField(":watch: Date / Heure ", date + " à " + time + "\n", true);
-        builder.addField(":pushpin: Roles :", roleText, true);
+        builder.addField(":gem: " + I18n.getMessage("created_by"), "**" + fieldValuePrefix + leader + "**", true);
+        builder.addField(":watch: " + I18n.getMessage("date_time"), date + " @ " + time + "\n", true);
+        builder.addField(":pushpin: " + I18n.getMessage("roles"), roleText, true);
         if ( legende ) {
-            builder.addField(":warning: Légende : ",legendeLine , true);
+            builder.addField(":warning: " + I18n.getMessage("legend") + " : ",legendeLine , true);
         }
         builder.setFooter("Raid ID : " + messageId + greetsLine, footer_img_url);
 

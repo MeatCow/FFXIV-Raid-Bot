@@ -2,6 +2,7 @@ package me.cbitler.raidbot.creation;
 
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.PendingRaid;
+import me.cbitler.raidbot.utility.I18n;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
@@ -31,7 +32,7 @@ public class RunChannelStep implements CreationStep {
         }
 
         if(!validChannel) {
-            e.getChannel().sendMessage("Ce chan n'existe pas, essaye encore...").queue();
+            e.getChannel().sendMessage(I18n.getMessage("cannot_find_channel")).queue();
             return false;
         }
 
@@ -44,7 +45,7 @@ public class RunChannelStep implements CreationStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Quel est le nom du chan que je dois pourrir avec l'annonce du raid ?";
+        return I18n.getMessage("select_channel");
     }
 
     /**

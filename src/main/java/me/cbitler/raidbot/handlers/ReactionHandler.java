@@ -5,6 +5,7 @@ import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.selection.PickRoleStep;
 import me.cbitler.raidbot.selection.SelectionStep;
+import me.cbitler.raidbot.utility.I18n;
 import me.cbitler.raidbot.utility.Reactions;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
@@ -36,7 +37,7 @@ public class ReactionHandler extends ListenerAdapter {
                             // Timestamp
                             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
                             String ordre = String.valueOf(timestamp.getTime());
-                            System.out.println("Add " + e.getMember().getEffectiveName() + " to raid for " + spec +"/"+role +" role. Ordre : " + ordre);
+                            System.out.println("Add " + e.getMember().getEffectiveName() + " to raid for " + spec +"/"+role +" role. Order : " + ordre);
                             raid.addUser(
                                 e.getUser().getId(),
                                 e.getMember().getEffectiveName(),
@@ -47,10 +48,10 @@ public class ReactionHandler extends ListenerAdapter {
                                 true
                             );
                         } else {
-                            e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Allez, on apprend à compter et on choisi un job dans lequel il reste de la place ?").queue());
+                            e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(I18n.getMessage("role_full_error")).queue());
                         }
                     } else {
-                        e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Alerte Alzheimer ! Tu as déjà choisi un job... Si tu ne veux plus participer avec ce job utilise le \"X\" rouge.").queue());
+                        e.getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(I18n.getMessage("role_already_picked")).queue());
                     }
                 }
             } else if(e.getReactionEmote().getEmote().getName().equalsIgnoreCase("X_")) {

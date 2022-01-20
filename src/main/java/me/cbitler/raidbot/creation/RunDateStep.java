@@ -2,6 +2,7 @@ package me.cbitler.raidbot.creation;
 
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.PendingRaid;
+import me.cbitler.raidbot.utility.I18n;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
@@ -31,7 +32,7 @@ public class RunDateStep implements CreationStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Quelle est la date pour ce petit raid ?";
+        return I18n.getMessage("raid_date_query");
     }
 
     /**

@@ -53,12 +53,6 @@
                 </executions>
             </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <directory>src/main/java/me/cbitler/raidbot/res</directory>
-                <excludes><exclude>**/*.java</exclude></excludes>
-            </resource>
-        </resources>
     </build>
 
     <dependencies>

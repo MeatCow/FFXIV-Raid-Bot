@@ -24,7 +24,7 @@ public class I18n {
 
     public static String getMessage(String key) {
         if (bundle == null) {
-            bundle = ResourceBundle.getBundle(BUNDLE_NAME);
+            bundle = ResourceBundle.getBundle(BUNDLE_NAME, Locale.ENGLISH);
         }
         return bundle.getString(key);
     }

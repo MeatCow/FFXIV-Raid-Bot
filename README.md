@@ -40,7 +40,7 @@ cd ~discordbots/src
 git clone https://github.com/MeatCow/FFXIV-Raid-Bot.git
 cd FFXIV-Raid-Bot
 mvn package
-cp ~discordbots/src/FFXIV-Raid-Bot/target/FFXIV-Raid-Bot-1.0-SNAPSHOT.jar ~discordbots/bots/FFXIV-Raid-Bot/FFXIV-Raid-Bot.jar
+cp ~discordbots/src/FFXIV-Raid-Bot/target/FFXIV-Raid-Bot-1.1-SNAPSHOT.jar ~discordbots/bots/FFXIV-Raid-Bot/FFXIV-Raid-Bot.jar
 cp -r ~discordbots/src/FFXIV-Raid-Bot/Reactions ~discordbots/bots/FFXIV-Raid-Bot/
 
 DISCORDBOT_HOME=$(realpath ~discordbots)
@@ -68,7 +68,7 @@ Register your bot on : https://discordapp.com/developers/applications/
 
 After this install, you need to put your bot secret token into : ~discordbots/bots/FFXIV-Raid-Bot/token
 
-The invite link with good permission mask (replace YOUR_BOT_ID_HERE by your bot client ID) :
+The invite link with good permission mask (replace YOUR_BOT_ID_HERE by your bot Client ID/Application ID) :
 - https://discordapp.com/oauth2/authorize?client_id=YOUR_BOT_ID_HERE&permissions=490560&scope=bot
 
 ## Credits

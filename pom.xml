@@ -6,7 +6,7 @@
 
     <groupId>me.cbitler</groupId>
     <artifactId>FFXIV-Raid-Bot</artifactId>
-    <version>1.1</version>
+    <version>1.2-SNAPSHOT</version>
     <build>
         <plugins>
             <plugin>
@@ -93,7 +93,6 @@
             <artifactId>commons-io</artifactId>
             <version>2.11.0</version>
         </dependency>
-
 
     </dependencies>
 

@@ -6,11 +6,13 @@ import java.util.List;
 /**
  * Class to store data about a raid that is being set up
  * This isn't commented as the method names should be self-explanatory
+ *
  * @author Christopher Bitler
  */
 public class PendingRaid {
-    String name, description, date, time, announcementChannel, serverId, leaderName, queued;
-    List<RaidRole> rolesWithNumbers = new ArrayList<RaidRole>();
+    String name, description, date, time, announcementChannel, serverId, leaderName;
+    boolean hasWaitingList = false;
+    List<RaidRole> rolesWithNumbers = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -72,11 +74,11 @@ public class PendingRaid {
         this.description = description;
     }
 
-    public void setQueued(String queued) {
-        this.queued = queued;
+    public void setWaitingList(boolean hasWaitingList) {
+        this.hasWaitingList = hasWaitingList;
     }
 
-    public String getQueued() {
-        return queued;
+    public boolean hasWaitingList() {
+        return hasWaitingList;
     }
 }

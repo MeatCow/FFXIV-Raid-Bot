@@ -22,7 +22,7 @@ public class Database {
             + " `description` text, \n"
             + " `date` text NOT NULL, \n"
             + " `time` text NOT NULL, \n"
-            + " queue  text NOT NULL, \n"
+            + " hasWaitingList boolean NOT NULL, \n"
             + " roles text NOT NULL);";
 
     String raidUsersTableInit = "CREATE TABLE IF NOT EXISTS raidUsers (\n"
@@ -68,15 +68,16 @@ public class Database {
 
     /**
      * Run a query and return the results using the specified query and parameters
+     *
      * @param query The query with ?s where the parameters need to be placed
-     * @param data The parameters to put in the query
+     * @param data  The parameters to put in the query
      * @return QueryResult representing the statement used and the ResultSet
      * @throws SQLException
      */
-    public QueryResult query(String query, String[] data) throws SQLException {
+    public QueryResult query(String query, Object[] data) throws SQLException {
         PreparedStatement stmt = connection.prepareStatement(query);
         int i = 1;
-        for(String input : data) {
+        for (Object input : data) {
             stmt.setObject(i, input);
             i++;
         }
@@ -88,14 +89,15 @@ public class Database {
 
     /**
      * Run an update query with the specified parameters
+     *
      * @param query The query with ?s where the parameters need to be placed
-     * @param data The parameters to put in the query
+     * @param data  The parameters to put in the query
      * @throws SQLException
      */
-    public void update(String query, String[] data) throws SQLException {
+    public void update(String query, Object[] data) throws SQLException {
         PreparedStatement stmt = connection.prepareStatement(query);
         int i = 1;
-        for(String input : data) {
+        for (Object input : data) {
             stmt.setObject(i, input);
             i++;
         }
@@ -119,6 +121,8 @@ public class Database {
             connection.createStatement().execute("ALTER TABLE raidUsers ADD COLUMN ordre text");
             connection.createStatement().execute("ALTER TABLE raids ADD COLUMN queue text");
             //connection.createStatement().execute("ALTER TABLE raids DROP COLUMN ordre text");
-        } catch (Exception e) { }
+        } catch (Exception e) {
+            System.out.println("Issue modifying raidUsers or raids table");
+        }
     }
 }

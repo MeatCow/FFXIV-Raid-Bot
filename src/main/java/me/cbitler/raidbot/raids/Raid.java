@@ -12,22 +12,24 @@ import java.util.*;
  * Represents a raid and has methods for adding/removing users, roles, etc
  */
 public class Raid {
-    String messageId, name, description, date,time, serverId, channelId, raidLeaderName, queued;
-    List<RaidRole> roles = new ArrayList<RaidRole>();
-    LinkedHashMap<RaidUser, String> userToRole = new LinkedHashMap<RaidUser, String>();
+    String messageId, name, description, date, time, serverId, channelId, raidLeaderName;
+    boolean hasWaitingList;
+    List<RaidRole> roles = new ArrayList<>();
+    LinkedHashMap<RaidUser, String> userToRole = new LinkedHashMap<>();
 
     /**
      * Create a new Raid with the specified data
-     * @param messageId The embedded message Id related to this raid
-     * @param serverId The serverId that the raid is on
-     * @param channelId The announcement channel's id for this raid
+     *
+     * @param messageId      The embedded message Id related to this raid
+     * @param serverId       The serverId that the raid is on
+     * @param channelId      The announcement channel's id for this raid
      * @param raidLeaderName The name of the raid leader
-     * @param name The name of the raid
-     * @param date The date of the raid
-     * @param time The time of the raid
-     * @param queued is the raid have a queue ? 0/1
+     * @param name           The name of the raid
+     * @param date           The date of the raid
+     * @param time           The time of the raid
+     * @param hasWaitingList Does the raid have a waiting list?
      */
-    public Raid(String messageId, String serverId, String channelId, String raidLeaderName, String name, String description, String date, String time, String queued) {
+    public Raid(String messageId, String serverId, String channelId, String raidLeaderName, String name, String description, String date, String time, boolean hasWaitingList) {
         this.messageId = messageId;
         this.serverId = serverId;
         this.channelId = channelId;
@@ -36,15 +38,16 @@ public class Raid {
         this.description = description;
         this.date = date;
         this.time = time;
-        this.queued = queued;
+        this.hasWaitingList = hasWaitingList;
     }
 
     /**
      * Get the message ID for this raid
+     *
      * @return The message ID for this raid
      */
-    public String getQueued() {
-        return queued;
+    public boolean hasWaitingList() {
+        return hasWaitingList;
     }
 
     /**
@@ -132,14 +135,14 @@ public class Raid {
      */
     public boolean isValidNotFullRole(String role) {
         RaidRole r = getRole(role);
-        // if queued raid, there is no limit
-        if(queued.equals("1")) {
+        // if hasWaitingList raid, there is no limit
+        if (hasWaitingList) {
             return true;
         }
 
-        if(r != null) {
+        if (r != null) {
             int max = r.getAmount();
-            if(getUserNumberInRole(role) < max) {
+            if (getUserNumberInRole(role) < max) {
                 return true;
             }
         }
@@ -275,13 +278,7 @@ public class Raid {
      * @param id The user's id
      */
     public void removeUser(String id) {
-        Iterator<Map.Entry<RaidUser, String>> users = userToRole.entrySet().iterator();
-        while (users.hasNext()) {
-            Map.Entry<RaidUser, String> user = users.next();
-            if(user.getKey().getId().equalsIgnoreCase(id)) {
-                users.remove();
-            }
-        }
+        userToRole.entrySet().removeIf(user -> user.getKey().getId().equalsIgnoreCase(id));
 
         try {
             RaidBot.getInstance().getDatabase().update("DELETE FROM `raidUsers` WHERE `userId` = ? AND `raidId` = ?",
@@ -298,13 +295,13 @@ public class Raid {
      * @param logLinks The list of links
      */
     public void messagePlayersWithLogLinks(List<String> logLinks) {
-        String logLinkMessage = "ArcDPS reports from **" + this.getName() + "**:\n";
-        for(String link : logLinks) {
-            logLinkMessage += (link + "\n");
+        StringBuilder logLinkMessage = new StringBuilder("ArcDPS reports from **" + this.getName() + "**:\n");
+        for (String link : logLinks) {
+            logLinkMessage.append(link).append("\n");
         }
 
-        final String finalLogLinkMessage = logLinkMessage;
-        for(RaidUser user : this.userToRole.keySet()) {
+        final String finalLogLinkMessage = logLinkMessage.toString();
+        for (RaidUser user : this.userToRole.keySet()) {
             RaidBot.getInstance().getServer(this.serverId).getMemberById(user.id).getUser().openPrivateChannel().queue(
                     privateChannel -> privateChannel.sendMessage(finalLogLinkMessage).queue()
             );
@@ -319,7 +316,9 @@ public class Raid {
         try {
             RaidBot.getInstance().getServer(getServerId()).getTextChannelById(getChannelId())
                     .editMessageById(getMessageId(), embed).queue();
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            System.out.println("Could not update embed for server: " + getServerId());
+        }
     }
 
     /**

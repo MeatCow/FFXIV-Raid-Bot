@@ -10,56 +10,62 @@ import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
  * Role setup step for the raid.
  * This one should take multiple inputs and as a result it doesn't finish until the user
  * types 'done'.
+ *
  * @author Christopher Bitler
  */
 public class RunRoleSetupStep implements CreationStep {
 
     /**
      * Handle user input - should be in the format [number]:[role] unless it is 'done'.
+     *
      * @param e The direct message event
      * @return True if the user entered 'done', false otherwise
      */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         RaidBot bot = RaidBot.getInstance();
         PendingRaid raid = bot.getPendingRaids().get(e.getAuthor().getId());
+        String incomingMessage = e.getMessage().getRawContent().trim();
 
-        if(e.getMessage().getRawContent().trim().equalsIgnoreCase("done")) { //TODO: Get content of message only once
-            if(raid.getRolesWithNumbers().size() > 0) {
+        if (incomingMessage.equalsIgnoreCase("done")) {
+            if (raid.getRolesWithNumbers().size() > 0) {
                 return true;
             } else {
                 e.getChannel().sendMessage(I18n.getMessage("add_minimum_roles")).queue();
                 return false;
             }
         } else {
-            if ( e.getMessage().getRawContent().trim().equalsIgnoreCase("D") ) {
+            if (incomingMessage.equalsIgnoreCase("D")) {
                 raid.getRolesWithNumbers().add(new RaidRole(1, "Tank"));
                 raid.getRolesWithNumbers().add(new RaidRole(1, "Heal"));
                 raid.getRolesWithNumbers().add(new RaidRole(2, "DPS"));
-                e.getChannel().sendMessage(I18n.getMessage("preformed_dungeon_added")).queue();
-                e.getChannel().sendMessage(I18n.getMessage("done_query")).queue(); //TODO: Put text into final variable
-            } else if ( e.getMessage().getRawContent().trim().equalsIgnoreCase("R") ) {
+                e.getChannel().sendMessage(I18n.getMessage("preformed_dungeon_added") + "\n" + I18n.getMessage("done_query")).queue();
+            } else if (incomingMessage.equalsIgnoreCase("R")) {
                 raid.getRolesWithNumbers().add(new RaidRole(2, "Tank"));
                 raid.getRolesWithNumbers().add(new RaidRole(2, "Heal"));
                 raid.getRolesWithNumbers().add(new RaidRole(4, "DPS"));
-                e.getChannel().sendMessage(I18n.getMessage("preformed_raid_added")).queue();
-                e.getChannel().sendMessage(I18n.getMessage("done_query")).queue();
+                e.getChannel().sendMessage(I18n.getMessage("preformed_raid_added") + "\n" + I18n.getMessage("done_query")).queue();
             } else {
-                String[] parts = e.getMessage().getRawContent().split(":");
-                if(parts.length < 2) {
+                String[] parts = incomingMessage.split(":");
+                if (parts.length < 2) {
                     e.getChannel().sendMessage(I18n.getMessage("preformed_setup_info")).queue();
                 } else {
                     try {
                         int amnt = Integer.parseInt(parts[0].trim());
                         String roleName = parts[1].trim();
                         // TODO: Standardize for role : DPS Heal Tank
-                        if ( roleName.equalsIgnoreCase("DPS") ) { roleName = "DPS"; }
-                        else if ( roleName.equalsIgnoreCase("Heal") ) { roleName = "Heal"; }
-                        else if ( roleName.equalsIgnoreCase("Tank") ) { roleName = "Tank"; }
+                        if (roleName.equalsIgnoreCase("DPS")) {
+                            roleName = "DPS";
+                        } else if (roleName.equalsIgnoreCase("Heal")) {
+                            roleName = "Heal";
+                        } else if (roleName.equalsIgnoreCase("Tank")) {
+                            roleName = "Tank";
+                        }
 
                         raid.getRolesWithNumbers().add(new RaidRole(amnt, roleName));
-                        e.getChannel().sendMessage(I18n.getMessage("i_have_added") + amnt + "  " + roleName + I18n.getMessage("to_your_raid")).queue(); //TODO: Change format / Integrate StringBuilder
-                        e.getChannel().sendMessage(I18n.getMessage("done_query")).queue();
+                        String sb = I18n.getMessage("i_have_added") + " " + amnt + " " + roleName + " " + I18n.getMessage("to_your_raid") + " " + I18n.getMessage("done_query");
+                        e.getChannel().sendMessage(sb).queue();
                     } catch (Exception ex) {
+                        System.out.println(ex);
                         e.getChannel().sendMessage(I18n.getMessage("role_input_error")).queue();
                     }
                 }

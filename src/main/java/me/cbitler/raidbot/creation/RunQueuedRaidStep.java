@@ -23,7 +23,7 @@ public class RunQueuedRaidStep implements CreationStep {
             return false;
         }
         String decision = e.getMessage().getRawContent().trim().toLowerCase();
-        String yn = "";
+        boolean hasWaitingList;
 
         switch(decision)
         {
@@ -31,19 +31,19 @@ public class RunQueuedRaidStep implements CreationStep {
             case "y":
             case "oui":
             case "o":
-                yn = "1";
+                hasWaitingList = true;
                 break;
             case "no":
             case "n":
             case "non":
-                yn = "0";
+                hasWaitingList = false;
                 break;
             default:
                 e.getChannel().sendMessage(I18n.getMessage("yes_no_request")).queue();
                 return false;
         }
 
-        raid.setQueued(yn); //TODO: Change to boolean
+        raid.setWaitingList(hasWaitingList);
 
         return true;
     }

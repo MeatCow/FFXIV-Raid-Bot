@@ -37,7 +37,7 @@ public class RaidManager {
                 channels.get(0).sendMessage(message).queue(message1 -> {
                     boolean inserted = insertToDatabase(raid, message1.getId(), message1.getGuild().getId(), message1.getChannel().getId());
                     if (inserted) {
-                        Raid newRaid = new Raid(message1.getId(), message1.getGuild().getId(), message1.getChannel().getId(), raid.getLeaderName(), raid.getName(), raid.getDescription(), raid.getDate(), raid.getTime(), raid.getQueued());
+                        Raid newRaid = new Raid(message1.getId(), message1.getGuild().getId(), message1.getChannel().getId(), raid.getLeaderName(), raid.getName(), raid.getDescription(), raid.getDate(), raid.getTime(), raid.hasWaitingList());
                         newRaid.roles.addAll(raid.rolesWithNumbers);
                         raids.add(newRaid);
 
@@ -71,7 +71,7 @@ public class RaidManager {
         String roles = formatRolesForDatabase(raid.getRolesWithNumbers());
 
         try {
-            db.update("INSERT INTO `raids` (`raidId`, `serverId`, `channelId`, `leader`, `name`, `description`, `date`, `time`, `queue`, `roles`) VALUES (?,?,?,?,?,?,?,?,?,?)", new String[] {
+            db.update("INSERT INTO `raids` (`raidId`, `serverId`, `channelId`, `leader`, `name`, `description`, `date`, `time`, `hasWaitingList`, `roles`) VALUES (?,?,?,?,?,?,?,?,?,?)", new Object[]{
                     messageId,
                     serverId,
                     channelId,
@@ -80,7 +80,7 @@ public class RaidManager {
                     raid.getDescription(),
                     raid.getDate(),
                     raid.getTime(),
-                    raid.getQueued(),
+                    raid.hasWaitingList(),
                     roles
             });
         } catch (SQLException e) {
@@ -102,11 +102,11 @@ public class RaidManager {
         Database db = bot.getDatabase();
 
         try {
-            QueryResult results = db.query("SELECT * FROM `raids`", new String[] {});
+            QueryResult results = db.query("SELECT * FROM `raids`", new Object[]{});
             while (results.getResults().next()) {
                 String name = results.getResults().getString("name");
                 String description = results.getResults().getString("description");
-                if(description == null) {
+                if (description == null) {
                     description = "N/A";
                 }
                 String date = results.getResults().getString("date");
@@ -115,25 +115,24 @@ public class RaidManager {
                 String messageId = results.getResults().getString("raidId");
                 String serverId = results.getResults().getString("serverId");
                 String channelId = results.getResults().getString("channelId");
-                String queued = results.getResults().getString("queue");
-                if ( queued == null ) {
-                    queued = "0";
-                }
+                boolean hasWaitingList = results.getResults().getBoolean("hasWaitingList");
+
                 String leaderName = null;
                 try {
                     leaderName = results.getResults().getString("leader");
-                } catch (Exception e) { }
+                } catch (Exception e) {
+                }
 
-                Raid raid = new Raid(messageId, serverId, channelId, leaderName, name, description, date, time, queued);
+                Raid raid = new Raid(messageId, serverId, channelId, leaderName, name, description, date, time, hasWaitingList);
                 String[] roleSplit = rolesText.split(";");
-                for(String roleAndAmount : roleSplit) {
+                for (String roleAndAmount : roleSplit) {
                     String[] parts = roleAndAmount.split(":");
                     int amnt = Integer.parseInt(parts[0]);
                     String role = parts[1];
                     raid.roles.add(new RaidRole(amnt, role));
                 }
                 raids.add(raid);
-                System.out.println("Adding raid : " + messageId +" "+ serverId +" "+ channelId +" "+ leaderName +" "+ name +" "+ description +" "+ date +" "+ time +" "+ queued);
+                System.out.println("Adding raid : " + messageId + " " + serverId + " " + channelId + " " + leaderName + " " + name + " " + description + " " + date + " " + time + " " + hasWaitingList);
             }
             results.getResults().close();
             results.getStmt().close();
@@ -185,13 +184,7 @@ public class RaidManager {
                 // Nothing, the message doesn't exist - it can happen
             }
 
-            Iterator<Raid> raidIterator = raids.iterator();
-            while (raidIterator.hasNext()) {
-                Raid raid = raidIterator.next();
-                if (raid.getMessageId().equalsIgnoreCase(messageId)) {
-                    raidIterator.remove();
-                }
-            }
+            raids.removeIf(raid -> raid.getMessageId().equalsIgnoreCase(messageId));
 
             try {
                 RaidBot.getInstance().getDatabase().update("DELETE FROM `raids` WHERE `raidId` = ?", new String[]{
@@ -232,18 +225,18 @@ public class RaidManager {
      * @return The formatted string
      */
     private static String formatRolesForDatabase(List<RaidRole> rolesWithNumbers) {
-        String data = "";
+        StringBuilder data = new StringBuilder();
 
         for (int i = 0; i < rolesWithNumbers.size(); i++) {
             RaidRole role = rolesWithNumbers.get(i);
             if(i == rolesWithNumbers.size() - 1) {
-                data += (role.amount + ":" + role.name);
+                data.append(role.amount).append(":").append(role.name);
             } else {
-                data += (role.amount + ":" + role.name + ";");
+                data.append(role.amount).append(":").append(role.name).append(";");
             }
         }
 
-        return data;
+        return data.toString();
     }
 
     /**

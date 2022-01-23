@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Class to store data about a raid that is being set up
- * This isn't commented as the method names should be self-explanatory
+ * Raid in the midst of being set up.
+ * Can be turned into Raid with the RaidManager.createRaid(PendingRaid) function
  *
  * @author Christopher Bitler
  */

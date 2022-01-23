@@ -18,15 +18,6 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
  * @author Christopher Bitler
  */
 public class DMHandler extends ListenerAdapter {
-    RaidBot bot;
-
-    /**
-     * Create a new direct message handler with the parent bot
-     * @param bot The parent bot
-     */
-    public DMHandler(RaidBot bot) {
-        this.bot = bot;
-    }
 
     /**
      * Handle receiving a private message.
@@ -36,6 +27,7 @@ public class DMHandler extends ListenerAdapter {
      */
     @Override
     public void onPrivateMessageReceived(PrivateMessageReceivedEvent e) {
+        RaidBot bot = RaidBot.getInstance();
         User author = e.getAuthor();
 
         if (bot.getCreationMap().containsKey(author.getId())) {

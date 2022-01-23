@@ -1,21 +1,13 @@
 package me.cbitler.raidbot.handlers;
 
-import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
-import me.cbitler.raidbot.selection.PickRoleStep;
-import me.cbitler.raidbot.selection.SelectionStep;
 import me.cbitler.raidbot.utility.I18n;
 import me.cbitler.raidbot.utility.Reactions;
-import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import java.util.function.Consumer;
 
 public class ReactionHandler extends ListenerAdapter {
     @Override
@@ -27,7 +19,7 @@ public class ReactionHandler extends ListenerAdapter {
         if (raid != null) {
             if (Reactions.getSpecs().contains(e.getReactionEmote().getEmote().getName())) {
                 if(e.getReactionEmote().getEmote().getName().equalsIgnoreCase("X_")) {
-                   raid.removeUser(e.getUser().getId());
+                   raid.removeUserById(e.getUser().getId());
                 } else {
                     if ( !raid.isUserInRaid(e.getUser().getId()) ) {
                         String spec = e.getReactionEmote().getEmote().getName();
@@ -42,7 +34,6 @@ public class ReactionHandler extends ListenerAdapter {
                                 e.getUser().getId(),
                                 e.getMember().getEffectiveName(),
                                 spec,
-                                role,
                                 ordre,
                                 true,
                                 true
@@ -55,7 +46,7 @@ public class ReactionHandler extends ListenerAdapter {
                     }
                 }
             } else if(e.getReactionEmote().getEmote().getName().equalsIgnoreCase("X_")) {
-                raid.removeUser(e.getUser().getId());
+                raid.removeUserById(e.getUser().getId());
             }
             e.getReaction().removeReaction(e.getUser()).queue();
         }

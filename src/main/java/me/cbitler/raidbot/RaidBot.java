@@ -48,7 +48,7 @@ public class RaidBot {
         instance = this;
 
         this.jda = jda;
-        jda.addEventListener(new DMHandler(this), new ChannelMessageHandler(), new ReactionHandler());
+        jda.addEventListener(new DMHandler(), new ChannelMessageHandler(), new ReactionHandler());
         db = new Database("raid.db");
         db.connect();
         RaidManager.loadRaids();

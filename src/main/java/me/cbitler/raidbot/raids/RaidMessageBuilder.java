@@ -42,7 +42,7 @@ public class RaidMessageBuilder {
             raid.getTime(),
             buildRolesText(raid),
             raid.messageId,
-                raid.hasWaitingList()
+            raid.hasWaitingList()
         );
     }
 

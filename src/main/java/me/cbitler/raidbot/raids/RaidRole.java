@@ -10,8 +10,9 @@ public class RaidRole {
 
     /**
      * Create a new RaidRole object
+     *
      * @param amount The max amount of the role
-     * @param name The name of the role
+     * @param name   The name of the role which is one of [DPS | Heal | Tank]
      */
     public RaidRole(int amount, String name) {
         this.amount = amount;

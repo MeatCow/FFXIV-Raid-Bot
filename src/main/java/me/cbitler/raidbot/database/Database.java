@@ -29,7 +29,6 @@ public class Database {
             + " userId text, \n"
             + " username text, \n"
             + " spec text, \n"
-            + " role text, \n"
             + " ordre text, \n"
             + " raidId text)";
 
@@ -88,6 +87,20 @@ public class Database {
     }
 
     /**
+     * Run a query and return the results
+     *
+     * @param query The query
+     * @return QueryResult representing the statement used and the ResultSet
+     * @throws SQLException
+     */
+    public QueryResult query(String query) throws SQLException {
+        PreparedStatement stmt = connection.prepareStatement(query);
+        ResultSet rs = stmt.executeQuery();
+
+        return new QueryResult(stmt, rs);
+    }
+
+    /**
      * Run an update query with the specified parameters
      *
      * @param query The query with ?s where the parameters need to be placed
@@ -108,21 +121,24 @@ public class Database {
 
     /**
      * Create the database tables. Also alters the raid table to add the leader column if it doesn't exist.
+     *
      * @throws SQLException
      */
-    public void tableInits() throws SQLException {
+    private void tableInits() throws SQLException {
         connection.createStatement().execute(raidTableInit);
         connection.createStatement().execute(raidUsersTableInit);
         connection.createStatement().execute(botServerSettingsInit);
 
         // Database updates
         try {
-            connection.createStatement().execute("DROP TABLE raidUsersQueue");
-            connection.createStatement().execute("ALTER TABLE raidUsers ADD COLUMN ordre text");
-            connection.createStatement().execute("ALTER TABLE raids ADD COLUMN queue text");
+            //connection.createStatement().execute("DROP TABLE IF EXISTS raidUsersQueue");
+            //connection.createStatement().execute("ALTER TABLE raidUsers ADD COLUMN ordre text");
+            //connection.createStatement().execute("ALTER TABLE raidUsers DROP COLUMN role");
+            //connection.createStatement().execute("ALTER TABLE raids ADD COLUMN queue text");
             //connection.createStatement().execute("ALTER TABLE raids DROP COLUMN ordre text");
         } catch (Exception e) {
             System.out.println("Issue modifying raidUsers or raids table");
+            System.out.println(e.getMessage());
         }
     }
 }

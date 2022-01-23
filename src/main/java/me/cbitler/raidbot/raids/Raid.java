@@ -1,12 +1,11 @@
 package me.cbitler.raidbot.raids;
 
 import me.cbitler.raidbot.RaidBot;
-import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 
-import java.awt.Color;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Represents a raid and has methods for adding/removing users, roles, etc
@@ -14,13 +13,13 @@ import java.util.*;
 public class Raid {
     String messageId, name, description, date, time, serverId, channelId, raidLeaderName;
     boolean hasWaitingList;
-    List<RaidRole> roles = new ArrayList<>();
-    LinkedHashMap<RaidUser, String> userToRole = new LinkedHashMap<>();
+    private List<RaidRole> roles = new ArrayList<>();
+    private List<RaidUser> users = new ArrayList<>();
 
     /**
      * Create a new Raid with the specified data
      *
-     * @param messageId      The embedded message Id related to this raid
+     * @param messageId      The embedded message Id related to this raid. Often treated/displayed as the Raid ID
      * @param serverId       The serverId that the raid is on
      * @param channelId      The announcement channel's id for this raid
      * @param raidLeaderName The name of the raid leader
@@ -39,6 +38,18 @@ public class Raid {
         this.date = date;
         this.time = time;
         this.hasWaitingList = hasWaitingList;
+    }
+
+    /**
+     * Create a new Raid from a pending raid
+     *
+     * @param messageId   The embedded message Id related to this raid. Often treated/displayed as the Raid ID
+     * @param serverId    The serverId that the raid is on
+     * @param channelId   The announcement channel's id for this raid
+     * @param pendingRaid The pending raid being transformed into a full raid
+     */
+    public Raid(String messageId, String serverId, String channelId, PendingRaid pendingRaid) {
+        this(messageId, serverId, channelId, pendingRaid.getLeaderName(), pendingRaid.getName(), pendingRaid.getDescription(), pendingRaid.getDate(), pendingRaid.getTime(), pendingRaid.hasWaitingList());
     }
 
     /**
@@ -142,7 +153,7 @@ public class Raid {
 
         if (r != null) {
             int max = r.getAmount();
-            if (getUserNumberInRole(role) < max) {
+            if (getQuantityInRole(role) < max) {
                 return true;
             }
         }
@@ -175,16 +186,14 @@ public class Raid {
     }
 
     /**
-     * Get the number of users in a role
+     * Gets the quantity of users in a role
      * @param role The name of the role
-     * @return The number of users in the role
+     * @return The quantity of users in the role
      */
-    private int getUserNumberInRole(String role) {
-        int inRole = 0;
-        for(Map.Entry<RaidUser, String> entry : userToRole.entrySet()) {
-            if(entry.getValue().equalsIgnoreCase(role)) inRole+=1;
-        }
-        return inRole;
+    private int getQuantityInRole(String role) {
+        return (int) users.stream()
+                .filter(user -> role.equalsIgnoreCase(user.getRole()))
+                .count();
     }
 
     /**
@@ -193,14 +202,9 @@ public class Raid {
      * @return The users in the role
      */
     public List<RaidUser> getUsersInRole(String role) {
-        List<RaidUser> users = new ArrayList<>();
-        for(Map.Entry<RaidUser, String> entry : userToRole.entrySet()) {
-            if(entry.getValue().equalsIgnoreCase(role)) {
-                users.add(entry.getKey());
-            }
-        }
-
-        return users;
+        return users.stream()
+                .filter(user -> role.equalsIgnoreCase(user.getRole()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -210,22 +214,20 @@ public class Raid {
      * @param id The id of the user
      * @param name The name of the user
      * @param spec The specialization they are playing
-     * @param role The role they will be playing in the raid
-     * @param ordre unix timestamp of user have been added
-     * @param db_insert Whether or not the user should be inserted. This is false when the roles are loaded from the database.
+     * @param ordre Unix timestamp of when user have been added
+     * @param db_insert Whether the user should be inserted. This is false when the roles are loaded from the database.
      * @return true if the user was added, false otherwise
      */
-    public boolean addUser(String id, String name, String spec, String role, String ordre, boolean db_insert, boolean update_message) {
-        RaidUser user = new RaidUser(id, name, spec, role, ordre);
+    public boolean addUser(String id, String name, String spec, String ordre, boolean db_insert, boolean update_message) {
+        RaidUser user = new RaidUser(id, name, spec, ordre);
 
-        if(db_insert) {
+        if (db_insert) {
             try {
-                RaidBot.getInstance().getDatabase().update("INSERT INTO `raidUsers` (`userId`, `username`, `spec`, `role`, `ordre`, `raidId`)" +
-                        " VALUES (?,?,?,?,?,?)", new String[]{
+                RaidBot.getInstance().getDatabase().update("INSERT INTO `raidUsers` (`userId`, `username`, `spec`, `ordre`, `raidId`)" +
+                        " VALUES (?,?,?,?,?)", new String[]{
                         id,
                         name,
                         spec,
-                        role,
                         ordre,
                         getMessageId()
                 });
@@ -235,7 +237,7 @@ public class Raid {
             }
         }
 
-        userToRole.put(user, role);
+        users.add(user);
 
         if(update_message) {
             updateMessage();
@@ -244,45 +246,25 @@ public class Raid {
     }
 
     /**
-     * Add a user to a flex role in this raid.
-     * This first creates the user and attempts to insert it into the database, if needed
-     * Then it adds them to list of raid users' flex roles with their flex role
-     * @param id The id of the user
-     * @param name The name of the user
-     * @param spec The specialization they are playing
-     * @param role The flex role they will be playing in the raid
-     * @param db_insert Whether or not the user should be inserted. This is false when the roles are loaded from the database.
-     * @return true if the user was added, false otherwise
-     *
-    public boolean addUserFlexRole(String id, String name, String spec, String role, boolean db_insert, boolean update_message) {
-        return true;
-    }
-    */
-
-    /**
      * Check if a specific user is in this raid
      * @param id The id of the user
      * @return True if they are in the raid, false otherwise
      */
     public boolean isUserInRaid(String id) {
-        for(Map.Entry<RaidUser, String> entry : userToRole.entrySet()) {
-            if(entry.getKey().getId().equalsIgnoreCase(id)) {
-                return true;
-            }
-        }
-        return false;
+        return users.stream()
+                .anyMatch(user -> user.getId().equalsIgnoreCase(id));
     }
 
     /**
      * Remove a user from this raid. This also updates the database to remove them from the raid
      * @param id The user's id
      */
-    public void removeUser(String id) {
-        userToRole.entrySet().removeIf(user -> user.getKey().getId().equalsIgnoreCase(id));
+    public void removeUserById(String id) {
+        users.removeIf(user -> user.getId().equalsIgnoreCase(id));
 
         try {
             RaidBot.getInstance().getDatabase().update("DELETE FROM `raidUsers` WHERE `userId` = ? AND `raidId` = ?",
-                    new String[] {id, getMessageId()});
+                    new String[]{id, getMessageId()});
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -301,7 +283,7 @@ public class Raid {
         }
 
         final String finalLogLinkMessage = logLinkMessage.toString();
-        for (RaidUser user : this.userToRole.keySet()) {
+        for (RaidUser user : users) {
             RaidBot.getInstance().getServer(this.serverId).getMemberById(user.id).getUser().openPrivateChannel().queue(
                     privateChannel -> privateChannel.sendMessage(finalLogLinkMessage).queue()
             );
@@ -335,12 +317,10 @@ public class Raid {
      * @return The RaidUser if they are in this raid, null otherwise
      */
     public RaidUser getUserByName(String name) {
-        for(RaidUser user : userToRole.keySet()) {
-            if(user.name.equalsIgnoreCase(name)) {
-                return user;
-            }
-        }
-        return null;
+        return users.stream()
+                .filter(user -> user.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
     }
 
     /**
@@ -348,14 +328,10 @@ public class Raid {
      * @param name The name of the user being removed
      */
     public void removeUserByName(String name) {
-        String idToRemove = "";
-        for(Map.Entry<RaidUser, String> entry : userToRole.entrySet()) {
-            if(entry.getKey().name.equalsIgnoreCase(name)) {
-                idToRemove = entry.getKey().id;
-            }
+        RaidUser r = null;
+        if ((r = getUserByName(name)) != null) {
+            removeUserById(r.getId());
         }
-
-        removeUser(idToRemove);
     }
 
 }

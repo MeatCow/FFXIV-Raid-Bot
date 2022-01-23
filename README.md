@@ -40,7 +40,7 @@ cd ~discordbots/src
 git clone https://github.com/MeatCow/FFXIV-Raid-Bot.git
 cd FFXIV-Raid-Bot
 mvn package
-cp ~discordbots/src/FFXIV-Raid-Bot/target/FFXIV-Raid-Bot-1.1-SNAPSHOT.jar ~discordbots/bots/FFXIV-Raid-Bot/FFXIV-Raid-Bot.jar
+cp ~discordbots/src/FFXIV-Raid-Bot/target/FFXIV-Raid-Bot-VERSION.jar ~discordbots/bots/FFXIV-Raid-Bot/FFXIV-Raid-Bot.jar
 cp -r ~discordbots/src/FFXIV-Raid-Bot/Reactions ~discordbots/bots/FFXIV-Raid-Bot/
 
 DISCORDBOT_HOME=$(realpath ~discordbots)
@@ -75,6 +75,7 @@ The invite link with good permission mask (replace YOUR_BOT_ID_HERE by your bot 
 
 ### FFXIV adaptation
 - Yann 'Ze' Richard : code adaptation and features for FFXIV, complete example for compile and install on Debian 9.
+- Matthieu Pauzé: Updated to support Endwalker.
 
 ### GW2 (original version)
 - Christopher Bitler: Bot development for the original GW2 version !

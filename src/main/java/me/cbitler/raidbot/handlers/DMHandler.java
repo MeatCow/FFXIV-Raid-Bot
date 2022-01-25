@@ -52,13 +52,17 @@ public class DMHandler extends ListenerAdapter {
                     e.getChannel().sendMessage(nextStep.getStepText()).queue();
                 } else {
                     //Create raid
-                    bot.getCreationMap().remove(author.getId());
-                    PendingRaid raid = bot.getPendingRaids().remove(author.getId());
                     try {
+                        PendingRaid raid = bot.getPendingRaids().get(author.getId());
+
                         RaidManager.createRaid(raid);
                         e.getChannel().sendMessage(I18n.getMessage("raid_creation_confirmed")).queue();
+
+                        bot.getPendingRaids().remove(author.getId());
+                        bot.getCreationMap().remove(author.getId());
                     } catch (Exception exception) {
                         e.getChannel().sendMessage(I18n.getMessage("insufficient_permissions")).queue();
+                        System.out.println(exception.getMessage());
                     }
                 }
             }

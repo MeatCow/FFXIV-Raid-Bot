@@ -4,14 +4,14 @@ import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.database.Database;
 import me.cbitler.raidbot.database.QueryResult;
 import me.cbitler.raidbot.utility.Reactions;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.*;
-import net.dv8tion.jda.core.requests.RestAction;
+import net.dv8tion.jda.core.entities.Emote;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.core.entities.TextChannel;
 
-import javax.imageio.stream.IIOByteBuffer;
 import java.sql.SQLException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -74,15 +74,15 @@ public class RaidManager {
         Database db = bot.getDatabase();
 
         try {
-            db.update("INSERT INTO `raids` (`raidId`, `serverId`, `channelId`, `leader`, `name`, `description`, `date`, `time`, `hasWaitingList`, `roles`) VALUES (?,?,?,?,?,?,?,?,?,?)", new Object[]{
+            db.update("INSERT INTO `raids` (`raidId`, `serverId`, `channelId`, `leader`, `name`, `description`, `dateTime`, `reminderTime`, `hasWaitingList`, `roles`) VALUES (?,?,?,?,?,?,?,?,?,?)", new Object[]{
                     raid.getMessageId(),
                     raid.getServerId(),
                     raid.getChannelId(),
                     raid.getRaidLeaderName(),
                     raid.getName(),
                     raid.getDescription(),
-                    raid.getDate(),
-                    raid.getTime(),
+                    raid.getRaidTime().format(Database.TIME_FORMAT),
+                    formatReminder(raid.getReminder()),
                     raid.hasWaitingList(),
                     formatRolesForDatabase(raid.getRoles())
             });
@@ -92,6 +92,21 @@ public class RaidManager {
         }
 
         return true;
+    }
+
+    /**
+     * Verifies if reminder is null before inserting to DB. If it's not null, it will format the zonedatetime
+     * into database's acceptable format.
+     * Necessary operation because the reminder is optional
+     *
+     * @param reminder RaidReminder to be changed to text
+     * @return String of ZoneDateTime from the RaidReminder object
+     */
+    private static String formatReminder(RaidReminder reminder) {
+        if (reminder != null) {
+            reminder.getReminderTime().format(Database.TIME_FORMAT);
+        }
+        return null;
     }
 
     /**
@@ -112,8 +127,8 @@ public class RaidManager {
                 if (description == null) {
                     description = "N/A";
                 }
-                String date = results.getResults().getString("date");
-                String time = results.getResults().getString("time");
+                ZonedDateTime dateTime = ZonedDateTime.parse(results.getResults().getString("dateTime"), Database.TIME_FORMAT);
+                ZonedDateTime reminderTime = null;
                 String rolesText = results.getResults().getString("roles");
                 String messageId = results.getResults().getString("raidId");
                 String serverId = results.getResults().getString("serverId");
@@ -124,9 +139,14 @@ public class RaidManager {
                 try {
                     leaderName = results.getResults().getString("leader");
                 } catch (Exception e) {
+                    System.out.println(e);
+                }
+                String reminder = results.getResults().getString("reminderTime");
+                if (reminder != null) {
+                    reminderTime = ZonedDateTime.parse(reminder, Database.TIME_FORMAT);
                 }
 
-                Raid raid = new Raid(messageId, serverId, channelId, leaderName, name, description, date, time, hasWaitingList);
+                Raid raid = new Raid(messageId, serverId, channelId, leaderName, name, description, dateTime, reminderTime, hasWaitingList);
                 String[] roleSplit = rolesText.split(";");
                 for (String roleAndAmount : roleSplit) {
                     String[] parts = roleAndAmount.split(":");
@@ -135,7 +155,7 @@ public class RaidManager {
                     raid.getRoles().add(new RaidRole(amnt, role));
                 }
                 raids.add(raid);
-                System.out.println("Adding raid : " + messageId + " " + serverId + " " + channelId + " " + leaderName + " " + name + " " + description + " " + date + " " + time + " " + hasWaitingList);
+                System.out.println("Adding raid : " + messageId + " " + serverId + " " + channelId + " " + leaderName + " " + name + " " + description + " " + dateTime + " " + " " + reminderTime + " " + hasWaitingList);
             }
             results.getResults().close();
             results.getStmt().close();
@@ -198,6 +218,7 @@ public class RaidManager {
                 });
             } catch (Exception e) {
                 System.out.println("Error encountered deleting raid");
+                System.out.println(e.getMessage());
             }
 
             return true;
@@ -213,12 +234,10 @@ public class RaidManager {
      * @return The raid object related to that messageId, if it exist.
      */
     public static Raid getRaid(String messageId) {
-        for (Raid raid : raids) {
-            if (raid.messageId.equalsIgnoreCase(messageId)) {
-                return raid;
-            }
-        }
-        return null;
+        return raids.stream()
+                .filter(raid -> raid.getMessageId().equalsIgnoreCase(messageId))
+                .findFirst()
+                .orElse(null);
     }
 
     /**

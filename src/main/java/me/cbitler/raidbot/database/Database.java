@@ -1,7 +1,7 @@
 package me.cbitler.raidbot.database;
 
 import java.sql.*;
-import java.util.List;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Class for managing the SQLite database for this bot
@@ -20,8 +20,8 @@ public class Database {
             + " leader text NOT NULL, \n"
             + " `name` text NOT NULL, \n"
             + " `description` text, \n"
-            + " `date` text NOT NULL, \n"
-            + " `time` text NOT NULL, \n"
+            + " `dateTime` text NOT NULL, \n"
+            + " `reminderTime` text, \n"
             + " hasWaitingList boolean NOT NULL, \n"
             + " roles text NOT NULL);";
 
@@ -35,9 +35,15 @@ public class Database {
     String botServerSettingsInit = "CREATE TABLE IF NOT EXISTS serverSettings (\n"
             + " serverId text PRIMARY KEY, \n"
             + " raid_leader_role text)";
+    /**
+     * Time format to be used when interacting with the database
+     */
+    public static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("dd-MM-uuuu hh:mma z");
 
     /**
-     * Create a new database with the specific filename
+     * Create a new database with the specific filename. Doesn't physically create a database until you call the
+     * connect method.
+     *
      * @param databaseName The filename/location of the SQLite database
      */
     public Database(String databaseName) {
@@ -46,6 +52,7 @@ public class Database {
 
     /**
      * Connect to the SQLite database and create the tables if they don't exist
+     * Also creates the physical database file if it doesn't already exist
      */
     public void connect() {
         String url = "jdbc:sqlite:" + databaseName;
@@ -71,7 +78,7 @@ public class Database {
      * @param query The query with ?s where the parameters need to be placed
      * @param data  The parameters to put in the query
      * @return QueryResult representing the statement used and the ResultSet
-     * @throws SQLException
+     * @throws SQLException If a database access error occurs
      */
     public QueryResult query(String query, Object[] data) throws SQLException {
         PreparedStatement stmt = connection.prepareStatement(query);
@@ -91,7 +98,7 @@ public class Database {
      *
      * @param query The query
      * @return QueryResult representing the statement used and the ResultSet
-     * @throws SQLException
+     * @throws SQLException If a database access error occurs
      */
     public QueryResult query(String query) throws SQLException {
         PreparedStatement stmt = connection.prepareStatement(query);
@@ -105,7 +112,7 @@ public class Database {
      *
      * @param query The query with ?s where the parameters need to be placed
      * @param data  The parameters to put in the query
-     * @throws SQLException
+     * @throws SQLException If a database access error occurs
      */
     public void update(String query, Object[] data) throws SQLException {
         PreparedStatement stmt = connection.prepareStatement(query);
@@ -122,23 +129,12 @@ public class Database {
     /**
      * Create the database tables. Also alters the raid table to add the leader column if it doesn't exist.
      *
-     * @throws SQLException
+     * @throws SQLException If a database access error occurs
      */
     private void tableInits() throws SQLException {
         connection.createStatement().execute(raidTableInit);
         connection.createStatement().execute(raidUsersTableInit);
         connection.createStatement().execute(botServerSettingsInit);
 
-        // Database updates
-        try {
-            //connection.createStatement().execute("DROP TABLE IF EXISTS raidUsersQueue");
-            //connection.createStatement().execute("ALTER TABLE raidUsers ADD COLUMN ordre text");
-            //connection.createStatement().execute("ALTER TABLE raidUsers DROP COLUMN role");
-            //connection.createStatement().execute("ALTER TABLE raids ADD COLUMN queue text");
-            //connection.createStatement().execute("ALTER TABLE raids DROP COLUMN ordre text");
-        } catch (Exception e) {
-            System.out.println("Issue modifying raidUsers or raids table");
-            System.out.println(e.getMessage());
-        }
     }
 }

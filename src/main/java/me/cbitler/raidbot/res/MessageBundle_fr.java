@@ -1,11 +1,6 @@
 package me.cbitler.raidbot.res;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Enumeration;
 import java.util.ListResourceBundle;
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
 
 public class MessageBundle_fr extends ListResourceBundle {
 
@@ -34,7 +29,8 @@ public class MessageBundle_fr extends ListResourceBundle {
             {"role_input_error", "Putain tu tapes n'importe quoi la..."},
             {"i_have_added", "J'ai donc ajouté "},
             {"to_your_raid", "dans ton raid!"},
-            {"raid_time_query", "Et c'est à quelle heure ta petite sauterie?"},
+            {"could_not_parse_date", "Format de date non-lisible, s'il vous plait utiliser le format DD-MM-YYYY MM:HH[AM/PM] TIMEZONE"},
+            {"raid_reminder_query", "Je peux envoyer un rappel avant le raid, utilise le format X:XX.\nSi tu ne veux pas de rappel, entrer non."},
             {"raid_cancelled", "Raid annulé."},
             {"raid_erase_error", "C'est la merde, j'arrive pas à effacer le raid..."},
             {"raid_nonexistent", "Dis non à la drogue ! Ce raid n'existe pas!"},

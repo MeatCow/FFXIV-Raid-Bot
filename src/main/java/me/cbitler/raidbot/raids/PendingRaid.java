@@ -1,5 +1,6 @@
 package me.cbitler.raidbot.raids;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +11,9 @@ import java.util.List;
  * @author Christopher Bitler
  */
 public class PendingRaid {
-    String name, description, date, time, announcementChannel, serverId, leaderName;
+    String name, description, announcementChannel, serverId, leaderName;
+    ZonedDateTime dateTime;
+    ZonedDateTime reminderTime;
     boolean hasWaitingList = false;
     List<RaidRole> rolesWithNumbers = new ArrayList<>();
 
@@ -22,20 +25,12 @@ public class PendingRaid {
         this.name = name;
     }
 
-    public String getDate() {
-        return date;
+    public ZonedDateTime getDateTime() {
+        return dateTime;
     }
 
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
+    public void setDate(ZonedDateTime dateTime) {
+        this.dateTime = dateTime;
     }
 
     public String getAnnouncementChannel() {
@@ -80,5 +75,17 @@ public class PendingRaid {
 
     public boolean hasWaitingList() {
         return hasWaitingList;
+    }
+
+    public void disableReminder() {
+        reminderTime = null;
+    }
+
+    public void setReminder(ZonedDateTime reminderTime) {
+        this.reminderTime = reminderTime;
+    }
+
+    public ZonedDateTime getReminderTime() {
+        return reminderTime;
     }
 }

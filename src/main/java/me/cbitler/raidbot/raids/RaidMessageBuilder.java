@@ -1,11 +1,13 @@
 package me.cbitler.raidbot.raids;
 
-import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.utility.I18n;
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.entities.MessageEmbed;
 
-import java.awt.Color;
+import java.awt.*;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * @author Yann 'Ze' Richard
@@ -25,8 +27,7 @@ public class RaidMessageBuilder {
                 raid.getName(),
                 raid.getDescription(),
                 raid.getLeaderName(),
-                raid.getDate(),
-                raid.getTime(),
+                raid.getDateTime(),
                 buildRolesText(raid),
                 "",
                 raid.hasWaitingList()
@@ -35,18 +36,17 @@ public class RaidMessageBuilder {
 
     public static MessageEmbed buildEmbed(Raid raid) {
         return buildEmbed(
-            raid.getName(),
-            raid.getDescription(),
-            raid.getRaidLeaderName(),
-            raid.getDate(),
-            raid.getTime(),
-            buildRolesText(raid),
-            raid.messageId,
-            raid.hasWaitingList()
+                raid.getName(),
+                raid.getDescription(),
+                raid.getRaidLeaderName(),
+                raid.getRaidTime(),
+                buildRolesText(raid),
+                raid.messageId,
+                raid.hasWaitingList()
         );
     }
 
-    private static MessageEmbed buildEmbed(String name, String description, String leader, String date, String time, String roleText, String messageId, boolean hasWaitingList) {
+    private static MessageEmbed buildEmbed(String name, String description, String leader, ZonedDateTime dateTime, String roleText, String messageId, boolean hasWaitingList) {
         EmbedBuilder builder = new EmbedBuilder();
 
         String author_img_url = "https://ffxiv.gamerescape.com/w/images/9/90/Player32_Icon.png";
@@ -72,12 +72,14 @@ public class RaidMessageBuilder {
             legendeLine = "**" + raiderPrefix + "** " + I18n.getMessage("in_raid");
             legendeLine += "**" + waitingListPrefix + "** " + I18n.getMessage("on_waiting_list");
         }
+        String date = dateTime.format(DateTimeFormatter.ofPattern("d/MM"));
+        String time = dateTime.withZoneSameInstant(ZoneId.of("US/Central")).format(DateTimeFormatter.ofPattern("hh:mma z"));
 
         builder.addField(":gem: " + I18n.getMessage("created_by"), "**" + fieldValuePrefix + leader + "**", true);
         builder.addField(":watch: " + I18n.getMessage("date_time"), date + " @ " + time + "\n", true);
         builder.addField(":pushpin: " + I18n.getMessage("roles"), roleText, true);
-        if ( legende ) {
-            builder.addField(":warning: " + I18n.getMessage("legend") + " : ",legendeLine , true);
+        if (legende) {
+            builder.addField(":warning: " + I18n.getMessage("legend") + " : ", legendeLine, true);
         }
         builder.setFooter("Raid ID : " + messageId + greetsLine, footer_img_url);
 

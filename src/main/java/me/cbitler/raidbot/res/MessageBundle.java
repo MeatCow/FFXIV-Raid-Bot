@@ -1,8 +1,6 @@
 package me.cbitler.raidbot.res;
 
-import java.util.Enumeration;
 import java.util.ListResourceBundle;
-import java.util.ResourceBundle;
 
 public class MessageBundle extends ListResourceBundle {
 
@@ -17,8 +15,8 @@ public class MessageBundle extends ListResourceBundle {
             {"yes_no_request", "Please answer [Yes/No]:"},
             {"cannot_find_channel", "Please give a valid channel name."},
             {"select_channel", "Enter the channel for raid run announcement:"},
-            {"raid_date_query", "Enter the date for the raid run:"},
-            {"raid_description", "Enter a description for the raid run:"},
+            {"raid_date_query", "Enter the date and time for the raid. Please use the format DD-MM-YYYY MM:HH[AM/PM] TIMEZONE."},
+            {"raid_description", "Enter a description for the raid:"},
             {"add_minimum_roles", "You must add at least one role."},
             {"preformed_setup_info", "Enter the roles for your raid run, in the format of [Max] : [DPS|Heal|Tank].\n" +
                     "You can also use preformatted roles:\n" +
@@ -28,10 +26,10 @@ public class MessageBundle extends ListResourceBundle {
             {"preformed_dungeon_added", "Preformed dungeon roles added!"},
             {"preformed_raid_added", "Preformed raid roles added!"},
             {"done_query", "If you are done, please enter *done*"},
+            {"could_not_parse_date", "Unable to read the date format, please use the DD-MM-YYYY MM:HH[AM/PM] TIMEZONE format"},
             {"role_input_error", "Invalid input : Make sure it's in the format of [number]:[role], ie. 1:DPS"},
             {"i_have_added", "I have added"},
             {"to_your_raid", "to your raid."},
-            {"raid_time_query", "Enter the time for raid run:"},
             {"raid_cancelled", "Raid cancelled."},
             {"raid_erase_error", "An error occurred ending the raid."},
             {"raid_nonexistent", "That raid doesn't exist on this server."},
@@ -48,6 +46,7 @@ public class MessageBundle extends ListResourceBundle {
             {"in_raid", ": on roster\n"},
             {"on_waiting_list", ": on waiting list\n"},
             {"legend", "Legend"},
+            {"raid_reminder_query", "How long before the raid would you like a reminder sent? Use the format X:XX.\nIf you don't want a reminder, please enter no"},
             {"added_to_raid", "Added to raid!"},
             {"select_a_role", "Please select a role"},
             {"or_hit_cancel", "or hit *cancel* to cancel role selection."},

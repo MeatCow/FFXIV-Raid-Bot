@@ -2,19 +2,24 @@ package me.cbitler.raidbot.raids;
 
 import me.cbitler.raidbot.RaidBot;
 import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.core.entities.TextChannel;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * Represents a raid and has methods for adding/removing users, roles, etc
  */
 public class Raid {
-    String messageId, name, description, date, time, serverId, channelId, raidLeaderName;
+    String messageId, name, description, serverId, channelId, raidLeaderName;
+    ZonedDateTime raidTime;
     boolean hasWaitingList;
-    private List<RaidRole> roles = new ArrayList<>();
-    private List<RaidUser> users = new ArrayList<>();
+    private final List<RaidRole> roles = new ArrayList<>();
+    private final List<RaidUser> users = new ArrayList<>();
+    private RaidReminder reminder = null;
 
     /**
      * Create a new Raid with the specified data
@@ -24,24 +29,29 @@ public class Raid {
      * @param channelId      The announcement channel's id for this raid
      * @param raidLeaderName The name of the raid leader
      * @param name           The name of the raid
-     * @param date           The date of the raid
-     * @param time           The time of the raid
+     * @param raidTime       The date/time of the raid
      * @param hasWaitingList Does the raid have a waiting list?
      */
-    public Raid(String messageId, String serverId, String channelId, String raidLeaderName, String name, String description, String date, String time, boolean hasWaitingList) {
+    public Raid(String messageId, String serverId, String channelId, String raidLeaderName, String name, String description, ZonedDateTime raidTime, ZonedDateTime reminderTime, boolean hasWaitingList) {
         this.messageId = messageId;
         this.serverId = serverId;
         this.channelId = channelId;
         this.raidLeaderName = raidLeaderName;
         this.name = name;
         this.description = description;
-        this.date = date;
-        this.time = time;
+        this.raidTime = raidTime;
         this.hasWaitingList = hasWaitingList;
+        setupReminder(reminderTime);
+    }
+
+    private void setupReminder(ZonedDateTime reminderTime) {
+        if (reminderTime != null) {
+            this.reminder = new RaidReminder(this, reminderTime);
+        }
     }
 
     /**
-     * Create a new Raid from a pending raid
+     * Create a new Raid from a pending raid. Used alongside server/message ID input from Discord to create a Raid.
      *
      * @param messageId   The embedded message Id related to this raid. Often treated/displayed as the Raid ID
      * @param serverId    The serverId that the raid is on
@@ -49,7 +59,15 @@ public class Raid {
      * @param pendingRaid The pending raid being transformed into a full raid
      */
     public Raid(String messageId, String serverId, String channelId, PendingRaid pendingRaid) {
-        this(messageId, serverId, channelId, pendingRaid.getLeaderName(), pendingRaid.getName(), pendingRaid.getDescription(), pendingRaid.getDate(), pendingRaid.getTime(), pendingRaid.hasWaitingList());
+        this(messageId
+                , serverId
+                , channelId
+                , pendingRaid.getLeaderName()
+                , pendingRaid.getName()
+                , pendingRaid.getDescription()
+                , pendingRaid.getDateTime()
+                , pendingRaid.getReminderTime()
+                , pendingRaid.hasWaitingList());
     }
 
     /**
@@ -109,18 +127,11 @@ public class Raid {
 
     /**
      * Get the date of this raid
+     *
      * @return The date of this raid
      */
-    public String getDate() {
-        return date;
-    }
-
-    /**
-     * Get the time of this raid
-     * @return The time of this raid
-     */
-    public String getTime() {
-        return time;
+    public ZonedDateTime getRaidTime() {
+        return raidTime;
     }
 
     /**
@@ -133,6 +144,7 @@ public class Raid {
 
     /**
      * Get the list of roles in this raid
+     *
      * @return The list of roles in this raid
      */
     public List<RaidRole> getRoles() {
@@ -140,7 +152,18 @@ public class Raid {
     }
 
     /**
-     * Check if a specific role is valid, and whether or not it's full
+     * Gets the RaidReminder associated with this raid.
+     *
+     * @return The Raid reminder, null if no reminder for this raid.
+     */
+    public RaidReminder getReminder() {
+        return reminder;
+    }
+
+    /**
+     * Check if a specific role is valid, and whether it's full. Note that raids that have waiting lists enabled
+     * will always return true, because you can have an unlimited amount of queuers.
+     *
      * @param role The role to check
      * @return True if it is valid and not full, false otherwise
      */
@@ -153,21 +176,10 @@ public class Raid {
 
         if (r != null) {
             int max = r.getAmount();
-            if (getQuantityInRole(role) < max) {
-                return true;
-            }
+            return getQuantityInRole(role) < max;
         }
 
         return false;
-    }
-
-    /**
-     * Check to see if a role is valid
-     * @param role The role name
-     * @return True if the role is valid, false otherwise
-     */
-    public boolean isValidRole(String role) {
-        return getRole(role) != null;
     }
 
     /**
@@ -305,6 +317,7 @@ public class Raid {
 
     /**
      * Build the embedded message that shows the information about this raid
+     *
      * @return The embedded message representing this raid
      */
     private MessageEmbed buildEmbed() {
@@ -312,7 +325,27 @@ public class Raid {
     }
 
     /**
+     * Returns list of current participants in the raid.
+     *
+     * @return Current raiders.
+     */
+    public List<RaidUser> getRaiders() {
+        return users;
+    }
+
+    /**
+     * Returns the TextChannel for this raid session.
+     * This is the same channel that has the embed post
+     *
+     * @return The discord channel for making announcements
+     */
+    public TextChannel getAnnouncementChannel() {
+        return RaidBot.getInstance().getServer(serverId).getTextChannelById(channelId);
+    }
+
+    /**
      * Get a RaidUser in this raid by their name
+     *
      * @param name The user's name
      * @return The RaidUser if they are in this raid, null otherwise
      */

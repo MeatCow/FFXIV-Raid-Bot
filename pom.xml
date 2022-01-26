@@ -61,9 +61,8 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>4.2.0_247</version>
+            <version>5.0.0-alpha.4</version>
         </dependency>
-
 
         <!-- https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc -->
         <dependency>
@@ -98,12 +97,4 @@
         </dependency>
 
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>jcenter</id>
-            <name>jcenter-bintray</name>
-            <url>https://jcenter.bintray.com</url>
-        </repository>
-    </repositories>
 </project>

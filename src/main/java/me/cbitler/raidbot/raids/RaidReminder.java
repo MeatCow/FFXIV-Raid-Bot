@@ -42,7 +42,8 @@ public class RaidReminder {
      * @return Time in ms until the reminder needs to be sent
      */
     private long calculateDelay(ZonedDateTime reminderTime) {
-        return Duration.between(ZonedDateTime.now(), reminderTime).toMillis();
+        long delay = Duration.between(ZonedDateTime.now(), reminderTime).toMillis();
+        return (delay > 0) ? delay : 0;
     }
 
     private class Reminder extends TimerTask {

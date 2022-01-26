@@ -30,7 +30,7 @@ public class MessageBundle_fr extends ListResourceBundle {
             {"i_have_added", "J'ai donc ajouté "},
             {"to_your_raid", "dans ton raid!"},
             {"could_not_parse_date", "Format de date non-lisible, s'il vous plait utiliser le format DD-MM-YYYY MM:HH[AM/PM] TIMEZONE"},
-            {"raid_reminder_query", "Je peux envoyer un rappel avant le raid, utilise le format X:XX.\nSi tu ne veux pas de rappel, entrer non."},
+            {"raid_reminder_query", "Je peux envoyer un rappel avant le raid, utilise le format XhXX or XXm.\nSi tu ne veux pas de rappel, entrer non."},
             {"raid_cancelled", "Raid annulé."},
             {"raid_erase_error", "C'est la merde, j'arrive pas à effacer le raid..."},
             {"raid_nonexistent", "Dis non à la drogue ! Ce raid n'existe pas!"},

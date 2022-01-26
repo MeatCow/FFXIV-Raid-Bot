@@ -46,7 +46,7 @@ public class MessageBundle extends ListResourceBundle {
             {"in_raid", ": on roster\n"},
             {"on_waiting_list", ": on waiting list\n"},
             {"legend", "Legend"},
-            {"raid_reminder_query", "How long before the raid would you like a reminder sent? Use the format X:XX.\nIf you don't want a reminder, please enter no"},
+            {"raid_reminder_query", "How long before the raid would you like a reminder sent? Use the format XhXX or XXm.\nIf you don't want a reminder, please enter no"},
             {"added_to_raid", "Added to raid!"},
             {"select_a_role", "Please select a role"},
             {"or_hit_cancel", "or hit *cancel* to cancel role selection."},

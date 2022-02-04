@@ -15,7 +15,7 @@ public class MessageBundle_fr extends ListResourceBundle {
             {"yes_no_request", "Répondre **oui** ou **non** c'est trop compliqué?!"},
             {"cannot_find_channel", "Please choose a valid channel."},
             {"select_channel", "Quel est le nom du chan que je dois pourrir avec l'annonce du raid?"},
-            {"raid_date_query", "Quelle est la date pour ce petit raid?"},
+            {"raid_date_query", "Quelle est la date pour ce petit raid? S'il vous plait utiliser le format DD-MM-YYYY HH:MM[AM/PM] TIMEZONE"},
             {"raid_description", "Une petite description du raid:"},
             {"add_minimum_roles", "T'es gentil mais il faut au moins un type de participant ..."},
             {"preformed_setup_info", "Rajoutes des types de participants en précisant chaque grands rôles au format : [nombre max]:[Rôle] ou alors utilises directement des rôles préformatés : \n" +
@@ -29,7 +29,7 @@ public class MessageBundle_fr extends ListResourceBundle {
             {"role_input_error", "Putain tu tapes n'importe quoi la..."},
             {"i_have_added", "J'ai donc ajouté "},
             {"to_your_raid", "dans ton raid!"},
-            {"could_not_parse_date", "Format de date non-lisible, s'il vous plait utiliser le format DD-MM-YYYY MM:HH[AM/PM] TIMEZONE"},
+            {"could_not_parse_date", "Format de date non-lisible, s'il vous plait utiliser le format DD-MM-YYYY HH:MM[AM/PM] TIMEZONE"},
             {"raid_reminder_query", "Je peux envoyer un rappel avant le raid, utilise le format XhXX or XXm.\nSi tu ne veux pas de rappel, entrer non."},
             {"raid_cancelled", "Raid annulé."},
             {"raid_erase_error", "C'est la merde, j'arrive pas à effacer le raid..."},

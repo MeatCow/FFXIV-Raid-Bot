@@ -15,7 +15,7 @@ public class MessageBundle extends ListResourceBundle {
             {"yes_no_request", "Please answer [Yes/No]:"},
             {"cannot_find_channel", "Please give a valid channel name."},
             {"select_channel", "Enter the channel for raid run announcement:"},
-            {"raid_date_query", "Enter the date and time for the raid. Please use the format DD-MM-YYYY MM:HH[AM/PM] TIMEZONE."},
+            {"raid_date_query", "Enter the date and time for the raid. Please use DD-MM-YYYY HH:MM[AM/PM] TIMEZONE as format."},
             {"raid_description", "Enter a description for the raid:"},
             {"add_minimum_roles", "You must add at least one role."},
             {"preformed_setup_info", "Enter the roles for your raid run, in the format of [Max] : [DPS|Heal|Tank].\n" +
@@ -26,7 +26,7 @@ public class MessageBundle extends ListResourceBundle {
             {"preformed_dungeon_added", "Preformed dungeon roles added!"},
             {"preformed_raid_added", "Preformed raid roles added!"},
             {"done_query", "If you are done, please enter *done*"},
-            {"could_not_parse_date", "Unable to read the date format, please use the DD-MM-YYYY MM:HH[AM/PM] TIMEZONE format"},
+            {"could_not_parse_date", "Unable to read the date format, please use DD-MM-YYYY HH:MM[AM/PM] TIMEZONE as format."},
             {"role_input_error", "Invalid input : Make sure it's in the format of [number]:[role], ie. 1:DPS"},
             {"i_have_added", "I have added"},
             {"to_your_raid", "to your raid."},

@@ -3,7 +3,6 @@ package me.cbitler.raidbot.logs;
 import me.cbitler.raidbot.utility.EnvVariables;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.PrivateChannel;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -101,7 +100,7 @@ public class LogParser implements Runnable {
             fileUpload.setEntity(multipart);
             CloseableHttpResponse response = client.execute(fileUpload);
             HttpEntity responseEntity = response.getEntity();
-            String responseText = IOUtils.toString(responseEntity.getContent());
+            String responseText = responseEntity.getContent().toString();
 
             JSONParser parser = new JSONParser();
 

@@ -38,7 +38,7 @@ public class Database {
     /**
      * Time format to be used when interacting with the database
      */
-    public static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("dd-MM-uuuu hh:mma z");
+    public static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("dd-MM-uuuu h:ma z");
 
     /**
      * Create a new database with the specific filename. Doesn't physically create a database until you call the

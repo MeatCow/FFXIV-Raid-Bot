@@ -28,7 +28,7 @@ public class RunDateTimeStep implements CreationStep {
         if (raid == null) {
             return false;
         }
-        String decision = e.getMessage().getRawContent();
+        String decision = e.getMessage().getRawContent().toUpperCase();
         try {
             ZonedDateTime dateTime = ZonedDateTime.parse(decision, Database.TIME_FORMAT);
             raid.setDate(dateTime);

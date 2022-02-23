@@ -30,11 +30,16 @@ public class DMHandler extends ListenerAdapter {
         RaidBot bot = RaidBot.getInstance();
         User author = e.getAuthor();
 
+        if (author == e.getJDA().getSelfUser()) {
+            //Message sent by bot
+            return;
+        }
+
         if (bot.getCreationMap().containsKey(author.getId())) {
-            if(e.getMessage().getRawContent().equalsIgnoreCase("cancel")) {
+            if (e.getMessage().getRawContent().equalsIgnoreCase("cancel")) {
                 bot.getCreationMap().remove(author.getId());
 
-                if(bot.getPendingRaids().get(author.getId()) != null) {
+                if (bot.getPendingRaids().get(author.getId()) != null) {
                     bot.getPendingRaids().remove(author.getId());
                 }
                 e.getChannel().sendMessage(I18n.getMessage("raid_creation_cancelled")).queue();

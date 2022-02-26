@@ -48,6 +48,7 @@ public class ChannelMessageHandler extends ListenerAdapter {
             }
         }
 
+        //TODO: Move the below logic to the StartRaidCommand class
         if (PermissionsUtil.hasRaidLeaderRole(e.getMember())) {
             if (e.getMessage().getRawContent().equalsIgnoreCase("!createRaid")) {
                 // Verify there is no pending
@@ -58,7 +59,7 @@ public class ChannelMessageHandler extends ListenerAdapter {
                     bot.getCreationMap().put(e.getAuthor().getId(), runNameStep);
                     e.getMessage().delete().queue();
                 } else {
-                    e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Impossible de créer un raid, tu en as un en cours de création...\n\n Si tu t'en souviens plus : Tapes 'cancel' !").queue());
+                    e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(I18n.getMessage("already_creating")).queue());
                 }
             } else if (e.getMessage().getRawContent().toLowerCase().startsWith("!removefromraid")) {
                 String[] split = e.getMessage().getRawContent().split(" ");

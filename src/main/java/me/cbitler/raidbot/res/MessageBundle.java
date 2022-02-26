@@ -50,5 +50,6 @@ public class MessageBundle extends ListResourceBundle {
             {"added_to_raid", "Added to raid!"},
             {"select_a_role", "Please select a role"},
             {"or_hit_cancel", "or hit *cancel* to cancel role selection."},
+            {"already_creating", "Raid creation already in progress\n\nIf you'd like to start over, enter cancel"}
     };
 }

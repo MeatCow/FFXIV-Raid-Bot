@@ -104,7 +104,7 @@ public class RaidManager {
      */
     private static String formatReminder(RaidReminder reminder) {
         if (reminder != null) {
-            reminder.getReminderTime().format(Database.TIME_FORMAT);
+            return reminder.getReminderTime().format(Database.TIME_FORMAT);
         }
         return null;
     }

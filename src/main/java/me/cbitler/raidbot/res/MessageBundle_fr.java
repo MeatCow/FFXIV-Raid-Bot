@@ -49,7 +49,8 @@ public class MessageBundle_fr extends ListResourceBundle {
             {"legend", "Légende"},
             {"added_to_raid", "Ajouté au raid !"},
             {"select_a_role", "Choisi un rôle"},
-            {"or_hit_cancel", "ou tape *cancel* pour annuler la sélection de rôles."}
+            {"or_hit_cancel", "ou tape *cancel* pour annuler la sélection de rôles."},
+            {"already_creating", "Impossible de créer un raid, tu en as un en cours de création...\n\nSi tu t'en souviens plus : Tapes 'cancel' !"}
     };
 
 }

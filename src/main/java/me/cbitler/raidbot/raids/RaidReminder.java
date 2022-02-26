@@ -17,15 +17,23 @@ public class RaidReminder {
      * Will Mention all the raid members in the message.
      *
      * @param raid         The raid instance for which this is sending out a message.
-     * @param reminderTime The time at which the reminder is sent to the Discord channel
+     * @param reminderTime The time at which the reminder is sent to the Discord channel. If in the past, no reminder is sent
      */
     public RaidReminder(Raid raid, ZonedDateTime reminderTime) throws IllegalArgumentException {
         if (reminderTime == null) {
             throw new IllegalArgumentException("Reminder time must not be null");
         }
+        if (reminderTime.isBefore(ZonedDateTime.now())) {
+            return;
+        }
         this.reminderTime = reminderTime;
         tm = new Timer();
-        tm.schedule(new Reminder(raid), calculateDelay(this.reminderTime));
+
+        long delay = calculateDelay(this.reminderTime).toMillis();
+
+        if (delay > 0) {
+            tm.schedule(new Reminder(raid), delay);
+        }
     }
 
     /**
@@ -36,14 +44,13 @@ public class RaidReminder {
     }
 
     /**
-     * Calculates the time (in ms) to the reminder
+     * Calculates the time between now and the argument
      *
-     * @param reminderTime When you want the reminder sent
-     * @return Time in ms until the reminder needs to be sent
+     * @param otherTime The time until which you need to calculate the difference
+     * @return Difference between now and argument
      */
-    private long calculateDelay(ZonedDateTime reminderTime) {
-        long delay = Duration.between(ZonedDateTime.now(), reminderTime).toMillis();
-        return (delay > 0) ? delay : 0;
+    private Duration calculateDelay(ZonedDateTime otherTime) {
+        return Duration.between(ZonedDateTime.now(), otherTime);
     }
 
     private class Reminder extends TimerTask {
@@ -60,7 +67,7 @@ public class RaidReminder {
             for (RaidUser r : raid.getRaiders()) {
                 message.append(RaidBot.getInstance().getJda().getUserById(r.getId()).getAsMention());
             }
-            message.append("\nScheduled raid happening soon!");
+            message.append("\nScheduled raid happening in " + calculateDelay(raid.getRaidTime()).toMinutes() + " minutes");
             raid.getAnnouncementChannel().sendMessage(message.toString()).queue();
 
         }
